@@ -23,6 +23,24 @@ static ssize_t _callback(void * cls, uint64_t pos, char * buf, size_t buf_size)
 	return size_to_copy;
 }
 
+static int _get_request_key(void * cls, enum MHD_ValueKind kind,
+							const char * key, const char * value)
+{
+	http_server_request_t * req = cls;
+	http_header_set_parameter(req->header, key, value);
+	return MHD_YES;
+}
+
+static int _response_not_found(struct MHD_Connection * conn)
+{
+	const char * text = "Not found\n";
+	struct MHD_Response * res;
+	res = MHD_create_response_from_buffer(strlen(text),
+										  (void*)text,
+										  MHD_RESPMEM_PERSISTENT);
+	return MHD_queue_response(conn, MHD_HTTP_NOT_FOUND, res);
+}
+
 static int _handler(void * cls,
 					struct MHD_Connection * conn,
 					const char * url,
@@ -44,7 +62,7 @@ static int _handler(void * cls,
 	if (server && server->handler_cb) {
 		http_server_request_t req = {.method = method,
 									 .path = url,
-									 .headers = NULL,
+									 .header = create_http_header(),
 									 .data = upload_data,
 									 .data_size = *upload_data_size};
 		http_response_t * res;
@@ -53,9 +71,15 @@ static int _handler(void * cls,
 		int status_code;
 		list_t * parameters;
 
+		MHD_get_connection_values(conn, MHD_HEADER_KIND, &_get_request_key, &req);
+
 		res = server->handler_cb(server, &req);
+
+		free_http_header(req.header);
+		
 		if (res == NULL) {
-			return MHD_NO;
+			/* return MHD_NO; */
+			return _response_not_found(conn);
 		}
 		
 		_res = MHD_create_response_from_callback(MHD_SIZE_UNKNOWN,
@@ -80,12 +104,13 @@ static int _handler(void * cls,
 		MHD_destroy_response(_res);
 		return ret;
 	} else {
-		const char * text = "Not Found\n";
-		struct MHD_Response * res;
-		res = MHD_create_response_from_buffer(strlen(text),
-											  (void*)text,
-											  MHD_RESPMEM_PERSISTENT);
-		return MHD_queue_response(conn, MHD_HTTP_NOT_FOUND, res);
+		return _response_not_found(conn);
+		/* const char * text = "Not Found\n"; */
+		/* struct MHD_Response * res; */
+		/* res = MHD_create_response_from_buffer(strlen(text), */
+		/* 									  (void*)text, */
+		/* 									  MHD_RESPMEM_PERSISTENT); */
+		/* return MHD_queue_response(conn, MHD_HTTP_NOT_FOUND, res); */
 	}
 }
 

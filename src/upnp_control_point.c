@@ -12,6 +12,9 @@
 #include "networkutil.h"
 
 
+static void _on_device_added(upnp_control_point_t * cp, upnp_device_t * device);
+static void _on_device_removed(upnp_control_point_t * cp, upnp_device_t * device);
+static void _on_event(upnp_control_point_t * cp, const char * sid, list_t * props);
 static void * _ssdp_receiver(void * arg);
 static void _ssdp_response_handler(struct sockaddr *, const char *, void *);
 static http_response_t * _http_server_handler(http_server_t * server, http_server_request_t * req);
@@ -48,12 +51,33 @@ list_t * upnp_control_point_get_devices(upnp_control_point_t * cp) {
 	return cp->devices;
 }
 
+void upnp_control_point_resolve_expired(upnp_control_point_t * cp) {
+	list_t * lst = cp->devices;
+	for (; lst; ) {
+		upnp_device_t * device = (upnp_device_t*)lst->data;
+		if (upnp_device_expired(device)) {
+			list_t * next = lst->next;
+			_on_device_removed(cp, device);
+			cp->devices = list_remove(cp->devices, lst, (_free_cb)upnp_free_device);
+			lst = next;
+		} else {
+			lst = lst->next;
+		}
+	}
+}
+
 void upnp_control_point_set_on_device_added(upnp_control_point_t * cp, cb_on_device_added on_device_added) {
 	cp->on_device_added = on_device_added;
 }
 
 void upnp_control_point_set_on_device_removed(upnp_control_point_t * cp, cb_on_device_removed on_device_removed) {
 	cp->on_device_removed = on_device_removed;
+}
+
+void _on_event(upnp_control_point_t * cp, const char * sid, list_t * props) {
+	if (cp->on_event) {
+		cp->on_event(sid, props);
+	}
 }
 
 void upnp_control_point_set_on_event(upnp_control_point_t * cp, cb_on_event on_event) {
@@ -153,6 +177,19 @@ int upnp_control_point_unsubscribe(upnp_control_point_t * cp, upnp_subscription_
 	return 0;
 }
 
+
+void _on_device_added(upnp_control_point_t * cp, upnp_device_t * device) {
+	if (cp->on_device_added) {
+		cp->on_device_added(device);
+	}
+}
+
+void _on_device_removed(upnp_control_point_t * cp, upnp_device_t * device) {
+	if (cp->on_device_removed) {
+		cp->on_device_removed(device);
+	}
+}
+
 void * _ssdp_receiver(void * arg) {
 	upnp_control_point_t * cp = (upnp_control_point_t*)arg;
 	ssdp_receiver_t * ssdp_receiver = create_ssdp_receiver();
@@ -220,23 +257,28 @@ void _ssdp_response_handler(struct sockaddr * addr, const char * ssdp, void * us
 	}
 	upnp_device_set_base_url(device, location);
 	cp->devices = list_add(cp->devices, device);
-	if (cp->on_device_added) {
-		cp->on_device_added(device);
-	}
+	_on_device_added(cp, device);
 }
 
 http_response_t * _http_server_handler(http_server_t * server, http_server_request_t * req) {
-	char firstline[1024] = {0,};
-	http_response_t * res = create_http_response();
 	if (strcmp(req->path, "/event") == 0) {
-		list_t * lst = upnp_read_propertyset(req->data);
+		char firstline[1024] = {0,};
+		http_response_t * res;
+		list_t * properties;
 		upnp_control_point_t * cp = server->cls;
-		if (cp->on_event) {
-			cp->on_event("", lst);
+		char * sid = http_header_get_parameter(req->header, "SID");
+		if (sid == NULL) {
+			return NULL;
 		}
+		properties = upnp_read_propertyset(req->data);
+		_on_event(cp, sid, properties);
+		list_clear(properties, (_free_cb)free_name_value);
+		/* http response ok */
+		snprintf(firstline, sizeof(firstline), "HTTP/1.1 200 OK");
+		res = create_http_response();
+		http_response_set_firstline(res, firstline);
+		return res;
 	}
 	
-	snprintf(firstline, sizeof(firstline), "HTTP/1.1 200 OK");
-	http_response_set_firstline(res, firstline);
-	return res;
+	return NULL;
 }

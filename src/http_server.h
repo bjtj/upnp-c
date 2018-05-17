@@ -2,14 +2,15 @@
 #define __HTTPSERVER_H__
 
 #include "public.h"
-#include "namevalue.h"
+// #include "listutil.h"
+#include "http_header.h"
 #include "http_response.h"
 
 typedef struct _http_server_request_t
 {
     const char * method;
 	const char * path;
-	const name_value_t * headers;
+	http_header_t * header;
 	const char * data;
 	size_t data_size;
 } http_server_request_t;

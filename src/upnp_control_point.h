@@ -28,6 +28,7 @@ extern void upnp_free_control_point(upnp_control_point_t * cp);
 extern void upnp_control_point_start(upnp_control_point_t * cp);
 extern void upnp_control_point_stop(upnp_control_point_t * cp);
 extern list_t * upnp_control_point_get_devices(upnp_control_point_t * cp);
+extern void upnp_control_point_resolve_expired(upnp_control_point_t * cp);
 extern void upnp_control_point_send_msearch(upnp_control_point_t * cp, const char * type, int mx);
 extern list_t * upnp_control_point_get_subscriptions(upnp_control_point_t * cp);
 extern void upnp_control_point_set_on_device_added(upnp_control_point_t * cp, cb_on_device_added on_device_added);
