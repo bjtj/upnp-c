@@ -1,7 +1,8 @@
 #include "networkutil.h"
 
 
-char * get_ipaddr_str(struct sockaddr * addr) {
+char * get_ipaddr_str(struct sockaddr * addr)
+{
 	char ipstr[INET6_ADDRSTRLEN] = {0,};
 	inet_ntop(addr->sa_family,
 			  (addr->sa_family == AF_INET ?
@@ -11,7 +12,8 @@ char * get_ipaddr_str(struct sockaddr * addr) {
 	return strdup(ipstr);
 }
 
-char * get_ipv4(void) {
+char * get_ipv4(void)
+{
 	char * ret = NULL;
 	struct ifaddrs * ifaddrs, * tmp;
 	getifaddrs(&ifaddrs);

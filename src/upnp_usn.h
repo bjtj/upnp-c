@@ -3,7 +3,8 @@
 
 #include "public.h"
 
-typedef struct _upnp_usn_t {
+typedef struct _upnp_usn_t
+{
 	char * udn;
 	char * rest;
 } upnp_usn_t;

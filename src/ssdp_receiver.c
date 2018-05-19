@@ -32,7 +32,8 @@ ssdp_receiver_t * create_ssdp_receiver(void)
 	return receiver;
 }
 
-void free_ssdp_receiver(ssdp_receiver_t * receiver) {
+void free_ssdp_receiver(ssdp_receiver_t * receiver)
+{
 
 	/*
 	 * IP_DROP_MEMBERSHIP is not necessary
@@ -43,7 +44,8 @@ void free_ssdp_receiver(ssdp_receiver_t * receiver) {
 	free(receiver);
 }
 
-int pending_ssdp_receiver(ssdp_receiver_t * receiver, unsigned long wait_milli) {
+int pending_ssdp_receiver(ssdp_receiver_t * receiver, unsigned long wait_milli)
+{
 	fd_set fds = receiver->read_fds;
 	struct timeval timeout;
 	timeout.tv_sec = wait_milli / 1000;
@@ -51,7 +53,8 @@ int pending_ssdp_receiver(ssdp_receiver_t * receiver, unsigned long wait_milli) 
 	return select(receiver->sock + 1, &fds, NULL, NULL, &timeout);
 }
 
-ssdp_header_t * receive_ssdp_header(ssdp_receiver_t * receiver) {
+ssdp_header_t * receive_ssdp_header(ssdp_receiver_t * receiver)
+{
 	char buffer[SSDP_PACKET_MAX] = {0,};
 	struct sockaddr_in addr = {0,};
 	socklen_t addr_len = sizeof(addr);

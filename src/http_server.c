@@ -115,7 +115,8 @@ static int _handler(void * cls,
 }
 
 
-http_server_t * create_http_server(int port, http_server_handler_cb handler_cb) {
+http_server_t * create_http_server(int port, http_server_handler_cb handler_cb)
+{
 	http_server_t * server = (http_server_t*)malloc(sizeof(http_server_t));
 	memset(server, 0, sizeof(http_server_t));
 	server->port = port;
@@ -123,11 +124,13 @@ http_server_t * create_http_server(int port, http_server_handler_cb handler_cb) 
 	return server;
 }
 
-void free_http_server(http_server_t * server) {
+void free_http_server(http_server_t * server)
+{
 	free(server);
 }
 
-void start_http_server(http_server_t * server) {
+void start_http_server(http_server_t * server)
+{
 	server->ptr = (void*)MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION,
 										  server->port,
 										  NULL,
@@ -138,15 +141,18 @@ void start_http_server(http_server_t * server) {
 	assert(server->ptr != NULL);
 }
 
-void stop_http_server(http_server_t * server) {
+void stop_http_server(http_server_t * server)
+{
 	MHD_stop_daemon((struct MHD_Daemon *)server->ptr);
 	server->ptr = NULL;
 }
 
-int http_server_is_running(http_server_t * server) {
+int http_server_is_running(http_server_t * server)
+{
 	return server->ptr != NULL;
 }
 
-int http_server_get_port(http_server_t * server) {
+int http_server_get_port(http_server_t * server)
+{
 	return server->port;
 }

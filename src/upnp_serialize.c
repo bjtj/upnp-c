@@ -4,7 +4,8 @@
 #include <libxml/xmlwriter.h>
 
 
-static upnp_service_t * s_read_service_node(xmlNode * node) {
+static upnp_service_t * s_read_service_node(xmlNode * node)
+{
 	upnp_service_t * service = upnp_create_service();
 	xmlNode * cur_node = node->xmlChildrenNode;
 	for (; cur_node; cur_node = cur_node->next) {
@@ -22,7 +23,8 @@ static upnp_service_t * s_read_service_node(xmlNode * node) {
 	return service;
 }
 
-static upnp_device_t * s_read_device_node(xmlNode * node) {
+static upnp_device_t * s_read_device_node(xmlNode * node)
+{
 	upnp_device_t * device = upnp_create_device();
 	xmlNode * cur_node;
 	for (cur_node = node->xmlChildrenNode; cur_node; cur_node = cur_node->next) {
@@ -59,7 +61,8 @@ static upnp_device_t * s_read_device_node(xmlNode * node) {
 	return device;
 }
 
-upnp_device_t * upnp_read_device_xml(const char * xml) {
+upnp_device_t * upnp_read_device_xml(const char * xml)
+{
 	upnp_device_t * device = NULL;
 	xmlDoc * doc;
 	xmlNode * root;
@@ -101,7 +104,8 @@ done:
 }
 
 
-static upnp_argument_t * s_read_argument(xmlNode * node) {
+static upnp_argument_t * s_read_argument(xmlNode * node)
+{
 	xmlNode * cur_node;
 	upnp_argument_t * argument = upnp_create_argument();
 	cur_node = node->xmlChildrenNode;
@@ -131,7 +135,8 @@ static upnp_argument_t * s_read_argument(xmlNode * node) {
 	return argument;
 }
 
-static upnp_action_t * s_read_action(xmlNode * node) {
+static upnp_action_t * s_read_action(xmlNode * node)
+{
 	xmlNode * cur_node = node->xmlChildrenNode;
 	upnp_action_t * action = upnp_create_action();
 	for (; cur_node; cur_node = cur_node->next) {
@@ -155,7 +160,8 @@ static upnp_action_t * s_read_action(xmlNode * node) {
 	return action;
 }
 
-static upnp_state_variable_t * s_read_state_variable(xmlNode * node) {
+static upnp_state_variable_t * s_read_state_variable(xmlNode * node)
+{
 	xmlAttr * attrs;
 	xmlNode * cur_node;
 	upnp_state_variable_t * state_variable = upnp_create_state_variable();
@@ -211,7 +217,8 @@ static upnp_state_variable_t * s_read_state_variable(xmlNode * node) {
 	return state_variable;
 }
 
-upnp_scpd_t * upnp_read_scpd_xml(const char * xml) {
+upnp_scpd_t * upnp_read_scpd_xml(const char * xml)
+{
 
 	upnp_scpd_t * scpd = NULL;
 	xmlDoc * doc;
@@ -262,7 +269,8 @@ done:
 	return scpd;
 }
 
-upnp_action_request_t * upnp_read_action_request(const char * xml) {
+upnp_action_request_t * upnp_read_action_request(const char * xml)
+{
 	upnp_action_request_t * request = NULL;
 	xmlDoc * doc;
 	xmlNode * root;
@@ -320,7 +328,8 @@ done:
 	return request;
 }
 
-upnp_action_response_t * upnp_read_action_response(const char * xml) {
+upnp_action_response_t * upnp_read_action_response(const char * xml)
+{
 	upnp_action_response_t * response = NULL;
 	xmlDoc * doc;
 	xmlNode * root;
@@ -388,7 +397,8 @@ done:
 }
 
 
-char * upnp_write_action_request(upnp_action_request_t * req) {
+char * upnp_write_action_request(upnp_action_request_t * req)
+{
 
 #define VALID_RC(rc) if ((rc) < 0) goto done;
 	
@@ -467,7 +477,8 @@ done:
 }
 
 
-char * upnp_write_action_response(upnp_action_response_t * res) {
+char * upnp_write_action_response(upnp_action_response_t * res)
+{
 #define VALID_RC(rc) if ((rc) < 0) goto done;
 	
 	char * out = NULL;
@@ -545,9 +556,8 @@ done:
 }
 
 
-
-
-list_t * upnp_read_propertyset(const char * xml) {
+list_t * upnp_read_propertyset(const char * xml)
+{
 	list_t * props = NULL;
 	xmlDoc * doc;
 	xmlNode * root;
@@ -593,7 +603,8 @@ done:
 	return props;
 }
 
-char * upnp_write_propertyset(list_t * props) {
+char * upnp_write_propertyset(list_t * props)
+{
 #define VALID_RC(rc) if ((rc) < 0) goto done;
 	
 	char * out = NULL;
@@ -649,4 +660,12 @@ done:
 	xmlFreeTextWriter(writer);
 	xmlBufferFree(buf);
 	return out;
+}
+
+int upnp_read_timeout(const char * timeout)
+{
+	if (strcmp_ignorecase(timeout, "Second-") == 0) {
+		return atoi(timeout + strlen("Second-"));
+	}
+	return -1;
 }

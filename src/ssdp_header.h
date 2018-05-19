@@ -7,7 +7,8 @@
 #include "listutil.h"
 #include "namevalue.h"
 
-typedef struct _ssdp_header_t {
+typedef struct _ssdp_header_t
+{
 	char * firstline;
 	list_t * parameters;
 } ssdp_header_t;

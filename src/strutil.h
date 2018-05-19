@@ -3,7 +3,8 @@
 
 #include "public.h"
 
-typedef struct _str_t {
+typedef struct _str_t
+{
 	const char * begin;
 	const char * end;
 } str_t;
@@ -17,7 +18,7 @@ extern char * strutil_strstr(str_t * str, const char * find);
 extern char * strutil_dup_cstr(str_t * str);
 extern str_t strutil_trim(str_t str);
 
-extern int strcmp_icase(char const * a, char const * b);
+extern int strcmp_ignorecase(char const * a, char const * b);
 extern char * strstr_last(const char * str, const char * pat);
 extern char * find_first(const char * str, const char * t);
 extern char * find_first_not(const char * str, const char * t);

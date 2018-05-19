@@ -11,5 +11,6 @@ extern char * upnp_write_action_request(upnp_action_request_t * req);
 extern char * upnp_write_action_response(upnp_action_response_t * res);
 extern list_t * upnp_read_propertyset(const char * xml);
 extern char * upnp_write_propertyset(list_t * props);
+extern int upnp_read_timeout(const char * timeout);
 
 #endif

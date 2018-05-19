@@ -2,19 +2,22 @@
 #include "namevalue.h"
 
 
-ssdp_header_t * create_ssdp_header(void) {
+ssdp_header_t * create_ssdp_header(void)
+{
 	ssdp_header_t * ssdp = (ssdp_header_t*)malloc(sizeof(ssdp_header_t));
 	memset(ssdp, 0, sizeof(ssdp_header_t));
 	return ssdp;
 }
 
-void free_ssdp_header(ssdp_header_t * ssdp) {
+void free_ssdp_header(ssdp_header_t * ssdp)
+{
 	free(ssdp->firstline);
 	list_clear(ssdp->parameters, (_free_cb)free_name_value);
 	free(ssdp);
 }
 
-char * ssdp_header_get_parameter(ssdp_header_t * header, const char * name) {
+char * ssdp_header_get_parameter(ssdp_header_t * header, const char * name)
+{
 	list_t * find = list_find(header->parameters,
 							  (void*)name,
 							  (_cmp_cb)name_value_cmp_name_ignorecase);
@@ -25,7 +28,8 @@ char * ssdp_header_get_parameter(ssdp_header_t * header, const char * name) {
 	return NULL;
 }
 
-void ssdp_header_set_parameter(ssdp_header_t * header, const char * name, const char * value) {
+void ssdp_header_set_parameter(ssdp_header_t * header, const char * name, const char * value)
+{
 	list_t * find = list_find(header->parameters,
 							  (void*)name,
 							  (_cmp_cb)name_value_cmp_name_ignorecase);
@@ -39,7 +43,8 @@ void ssdp_header_set_parameter(ssdp_header_t * header, const char * name, const 
 	}
 }
 
-name_value_t * read_ssdp_header_parameter(str_t line) {
+name_value_t * read_ssdp_header_parameter(str_t line)
+{
 	name_value_t * nv = NULL;
 	char * sep = strutil_strstr(&line, ":");
 	if (sep == NULL) {
@@ -56,7 +61,8 @@ name_value_t * read_ssdp_header_parameter(str_t line) {
 	return nv;
 }
 
-ssdp_header_t * read_ssdp_header(const char * str) {
+ssdp_header_t * read_ssdp_header(const char * str)
+{
 	ssdp_header_t * ssdp = create_ssdp_header();
 	int first = 1;
 	const char * end = strstr(str, "\r\n");
@@ -80,7 +86,8 @@ ssdp_header_t * read_ssdp_header(const char * str) {
 	return ssdp;
 }
 
-notify_type_e ssdp_header_get_nts(ssdp_header_t * ssdp) {
+notify_type_e ssdp_header_get_nts(ssdp_header_t * ssdp)
+{
 	char * nts = ssdp_header_get_parameter(ssdp, "NTS");
 	if (nts == NULL) {
 		return NTS_UNKNOWN;
@@ -95,7 +102,8 @@ notify_type_e ssdp_header_get_nts(ssdp_header_t * ssdp) {
 	return NTS_UNKNOWN;
 }
 
-void ssdp_header_set_nts(ssdp_header_t * header, notify_type_e type) {
+void ssdp_header_set_nts(ssdp_header_t * header, notify_type_e type)
+{
 	switch (type) {
 	case NTS_ALIVE: {
 		ssdp_header_set_parameter(header, "NTS", "ssdp:alive");

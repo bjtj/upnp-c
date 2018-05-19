@@ -3,7 +3,8 @@
 
 #include "public.h"
 
-typedef struct _name_value_t {
+typedef struct _name_value_t
+{
 	char * name;
 	char * value;
 } name_value_t;

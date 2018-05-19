@@ -6,7 +6,8 @@
 #define SSDP_PORTSTR "1900"
 #define SSDP_PACKET_MAX 4096
 
-typedef enum _notify_type_e {
+typedef enum _notify_type_e
+{
 	NTS_UNKNOWN, NTS_ALIVE, NTS_UPDATE, NTS_BYEBYE
 } notify_type_e;
 

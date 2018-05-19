@@ -2,7 +2,8 @@
 #include "strutil.h"
 
 
-char * url_relative(const char * url, const char * relative) {
+char * url_relative(const char * url, const char * relative)
+{
 	const char * first_sep;
 	const char * last_sep;
 	const char * beg = strstr(url, "//");

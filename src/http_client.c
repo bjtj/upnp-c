@@ -2,14 +2,16 @@
 #include <curl/curl.h>
 
 
-typedef struct _data_t {
+typedef struct _data_t
+{
     char * buffer;
 	int buffer_size;
 	int pos;
 } data_t;
 
 
-static size_t cb_write(void * contents, size_t size, size_t nmemb, void * userp) {
+static size_t cb_write(void * contents, size_t size, size_t nmemb, void * userp)
+{
 	data_t * data = (data_t*)userp;
 	size_t total = size * nmemb;
 	size_t read_size = total;
@@ -23,7 +25,8 @@ static size_t cb_write(void * contents, size_t size, size_t nmemb, void * userp)
 	return total;
 }
 
-static size_t cb_header(char * buffer, size_t size, size_t nitems, void * userdata) {
+static size_t cb_header(char * buffer, size_t size, size_t nitems, void * userdata)
+{
 	size_t total = nitems * size;
 	http_response_t * response = (http_response_t*)userdata;
 	http_header_t * header = http_response_get_header(response);
@@ -43,15 +46,18 @@ static size_t cb_header(char * buffer, size_t size, size_t nitems, void * userda
 }
 
 
-void http_client_global_init(void) {
+void http_client_global_init(void)
+{
 	curl_global_init(CURL_GLOBAL_ALL);
 }
 
-void http_client_global_release(void) {
+void http_client_global_release(void)
+{
 	curl_global_cleanup();
 }
 
-http_response_t * http_client_get_dump(const char * url, list_t * parameters) {
+http_response_t * http_client_get_dump(const char * url, list_t * parameters)
+{
 	struct curl_slist * headers = NULL;
 	CURLcode res;
 	CURL * curl;
@@ -105,7 +111,8 @@ done:
 
 
 http_response_t * http_client_post(const char * url, list_t * parameters,
-								   const char * type, const char * text) {
+								   const char * type, const char * text)
+{
 	struct curl_slist * headers = NULL;
 	CURLcode res;
 	CURL * curl;
@@ -161,7 +168,8 @@ done:
 	return response;
 }
 
-http_response_t * http_client_custom(const char * url, list_t * parameters, const char * method) {
+http_response_t * http_client_custom(const char * url, list_t * parameters, const char * method)
+{
 	CURLcode res;
 	CURL * curl;
 	struct curl_slist * headers = NULL;

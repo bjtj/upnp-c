@@ -4,14 +4,16 @@
 
 /* device */
 
-upnp_device_t * upnp_create_device(void) {
+upnp_device_t * upnp_create_device(void)
+{
 	upnp_device_t * device = (upnp_device_t*)malloc(sizeof(upnp_device_t));
 	memset(device, 0, sizeof(upnp_device_t));
 	upnp_device_update_tick(device);
 	return device;
 }
 
-void upnp_free_device(upnp_device_t * device) {
+void upnp_free_device(upnp_device_t * device)
+{
 	if (device == NULL) {
 		return;
 	}
@@ -26,28 +28,34 @@ void upnp_device_update_tick(upnp_device_t * device) {
 	device->tick = tick_milli();
 }
 
-void upnp_device_set_timeout(upnp_device_t * device, unsigned long timeout) {
+void upnp_device_set_timeout(upnp_device_t * device, unsigned long timeout)
+{
 	device->timeout = timeout;
 }
 
-int upnp_device_expired(upnp_device_t * device) {
+int upnp_device_expired(upnp_device_t * device)
+{
 	return ((tick_milli() - device->tick) >= device->timeout);
 }
 
-char * upnp_device_get_base_url(upnp_device_t * device) {
+char * upnp_device_get_base_url(upnp_device_t * device)
+{
 	return device->base_url;
 }
 
-void upnp_device_set_base_url(upnp_device_t * device, const char * base_url) {
+void upnp_device_set_base_url(upnp_device_t * device, const char * base_url)
+{
 	free(device->base_url);
 	device->base_url = strdup(base_url);
 }
 
-int upnp_device_cmp_udn(upnp_device_t * device, const char * udn) {
+int upnp_device_cmp_udn(upnp_device_t * device, const char * udn)
+{
 	return strcmp(upnp_device_get_udn(device), udn);
 }
 
-const char * upnp_device_get_udn(upnp_device_t * device) {
+const char * upnp_device_get_udn(upnp_device_t * device)
+{
 	property_t * prop = property_get(device->properties, "UDN");
 	if (prop) {
 		return property_get_value(prop);
@@ -55,7 +63,8 @@ const char * upnp_device_get_udn(upnp_device_t * device) {
 	return NULL;
 }
 
-const char * upnp_device_get_friendlyname(upnp_device_t * device) {
+const char * upnp_device_get_friendlyname(upnp_device_t * device)
+{
 	property_t * prop = property_get(device->properties, "friendlyName");
 	if (prop) {
 		return property_get_value(prop);
@@ -63,31 +72,37 @@ const char * upnp_device_get_friendlyname(upnp_device_t * device) {
 	return NULL;
 }
 
-void upnp_device_add_child_device(upnp_device_t * device, upnp_device_t * child_device) {
+void upnp_device_add_child_device(upnp_device_t * device, upnp_device_t * child_device)
+{
 	device->embedded_devices = list_add(device->embedded_devices, child_device);
 }
 
-void upnp_device_set_udn(upnp_device_t * device, const char * udn) {
+void upnp_device_set_udn(upnp_device_t * device, const char * udn)
+{
 	device->properties = property_put(device->properties, "UDN", udn);
 	list_iter(device->embedded_devices, (void*)udn, (_iter_cb)upnp_device_set_udn);
 }
 
-void upnp_device_set_scpd_url(upnp_device_t * device, const char * url) {
+void upnp_device_set_scpd_url(upnp_device_t * device, const char * url)
+{
 	list_iter(device->services, (void*)url, (_iter_cb)upnp_service_set_scpd_url);
 	list_iter(device->embedded_devices, (void*)url, (_iter_cb)upnp_device_set_scpd_url);
 }
 
-void upnp_device_set_control_url(upnp_device_t * device, const char * url) {
+void upnp_device_set_control_url(upnp_device_t * device, const char * url)
+{
 	list_iter(device->services, (void*)url, (_iter_cb)upnp_service_set_control_url);
 	list_iter(device->embedded_devices, (void*)url, (_iter_cb)upnp_device_set_control_url);
 }
 
-void upnp_device_set_subscribe_url(upnp_device_t * device, const char * url) {
+void upnp_device_set_subscribe_url(upnp_device_t * device, const char * url)
+{
 	list_iter(device->services, (void*)url, (_iter_cb)upnp_service_set_subscribe_url);
 	list_iter(device->embedded_devices, (void*)url, (_iter_cb)upnp_device_set_subscribe_url);
 }
 
-upnp_service_t * upnp_device_get_service(upnp_device_t * device, const char * type) {
+upnp_service_t * upnp_device_get_service(upnp_device_t * device, const char * type)
+{
 	list_t * find;
 	find = list_find(device->services, (void*)type, (_cmp_cb)upnp_service_cmp_type);
 	if (find) {
@@ -103,13 +118,15 @@ upnp_service_t * upnp_device_get_service(upnp_device_t * device, const char * ty
 
 /* service */
 
-upnp_service_t * upnp_create_service(void) {
+upnp_service_t * upnp_create_service(void)
+{
 	upnp_service_t * service = (upnp_service_t*)malloc(sizeof(upnp_service_t));
 	memset(service, 0, sizeof(upnp_service_t));
 	return service;
 }
 
-void upnp_free_service(upnp_service_t * service) {
+void upnp_free_service(upnp_service_t * service)
+{
 	if (service == NULL) {
 		return;
 	}
@@ -119,27 +136,33 @@ void upnp_free_service(upnp_service_t * service) {
 }
 
 
-int upnp_service_cmp_type(upnp_service_t * service, const char * type) {
+int upnp_service_cmp_type(upnp_service_t * service, const char * type)
+{
 	return strcmp(upnp_service_get_type(service), type);
 }
 
-int upnp_service_cmp_id(upnp_service_t * service, const char * id) {
+int upnp_service_cmp_id(upnp_service_t * service, const char * id)
+{
 	return strcmp(upnp_service_get_id(service), id);
 }
 
-int upnp_service_cmp_scpd_url(upnp_service_t * service, const char * url) {
+int upnp_service_cmp_scpd_url(upnp_service_t * service, const char * url)
+{
 	return strcmp(upnp_service_get_scpd_url(service), url);
 }
 
-int upnp_service_cmp_control_url(upnp_service_t * service, const char * url) {
+int upnp_service_cmp_control_url(upnp_service_t * service, const char * url)
+{
 	return strcmp(upnp_service_get_control_url(service), url);
 }
 
-int upnp_service_cmp_subscribe_url(upnp_service_t * service, const char * url) {
+int upnp_service_cmp_subscribe_url(upnp_service_t * service, const char * url)
+{
 	return strcmp(upnp_service_get_subscribe_url(service), url);
 }
 
-const char * upnp_service_get_type(upnp_service_t * service) {
+const char * upnp_service_get_type(upnp_service_t * service)
+{
 	property_t * prop = property_get(service->properties, "serviceType");
 	if (prop) {
 		return property_get_value(prop);
@@ -147,7 +170,8 @@ const char * upnp_service_get_type(upnp_service_t * service) {
 	return NULL;
 }
 
-const char * upnp_service_get_id(upnp_service_t * service) {
+const char * upnp_service_get_id(upnp_service_t * service)
+{
 	property_t * prop =  property_get(service->properties, "serviceId");
 	if (prop) {
 		return property_get_value(prop);
@@ -155,7 +179,8 @@ const char * upnp_service_get_id(upnp_service_t * service) {
 	return NULL;
 }
 
-const char * upnp_service_get_scpd_url(upnp_service_t * service) {
+const char * upnp_service_get_scpd_url(upnp_service_t * service)
+{
 	property_t * prop = property_get(service->properties, "SCPDURL");
 	if (prop) {
 		return property_get_value(prop);
@@ -163,7 +188,8 @@ const char * upnp_service_get_scpd_url(upnp_service_t * service) {
 	return NULL;
 }
 
-const char * upnp_service_get_control_url(upnp_service_t * service) {
+const char * upnp_service_get_control_url(upnp_service_t * service)
+{
 	property_t * prop = property_get(service->properties, "controlURL");
 	if (prop) {
 		return property_get_value(prop);
@@ -171,7 +197,8 @@ const char * upnp_service_get_control_url(upnp_service_t * service) {
 	return NULL;
 }
 
-const char * upnp_service_get_subscribe_url(upnp_service_t * service) {
+const char * upnp_service_get_subscribe_url(upnp_service_t * service)
+{
 	property_t * prop = property_get(service->properties, "eventSubURL");
 	if (prop) {
 		return property_get_value(prop);
@@ -179,7 +206,8 @@ const char * upnp_service_get_subscribe_url(upnp_service_t * service) {
 	return NULL;
 }
 
-upnp_action_t * upnp_service_get_action(upnp_service_t * service, const char * name) {
+upnp_action_t * upnp_service_get_action(upnp_service_t * service, const char * name)
+{
 	list_t * lst;
 	if (service->scpd == NULL) {
 		return NULL;
@@ -193,7 +221,8 @@ upnp_action_t * upnp_service_get_action(upnp_service_t * service, const char * n
 	}
 	return NULL;
 }
-upnp_state_variable_t * upnp_service_get_state_variable(upnp_service_t * service, const char * name) {
+upnp_state_variable_t * upnp_service_get_state_variable(upnp_service_t * service, const char * name)
+{
 	list_t * lst;
 	if (service->scpd == NULL) {
 		return NULL;
@@ -208,36 +237,43 @@ upnp_state_variable_t * upnp_service_get_state_variable(upnp_service_t * service
 	return NULL;
 }
 
-void upnp_service_set_type(upnp_service_t * service, const char * type) {
+void upnp_service_set_type(upnp_service_t * service, const char * type)
+{
 	service->properties = property_put(service->properties, "serviceType", type);
 }
 
-void upnp_service_set_id(upnp_service_t * service, const char * id) {
+void upnp_service_set_id(upnp_service_t * service, const char * id)
+{
 	service->properties = property_put(service->properties, "serviceId", id);
 }
 
-void upnp_service_set_scpd_url(upnp_service_t * service, const char * url) {
+void upnp_service_set_scpd_url(upnp_service_t * service, const char * url)
+{
 	service->properties = property_put(service->properties, "SCPDURL", url);
 }
 
-void upnp_service_set_control_url(upnp_service_t * service, const char * url) {
+void upnp_service_set_control_url(upnp_service_t * service, const char * url)
+{
 	service->properties = property_put(service->properties, "controlURL", url);
 }
 
-void upnp_service_set_subscribe_url(upnp_service_t * service, const char * url) {
+void upnp_service_set_subscribe_url(upnp_service_t * service, const char * url)
+{
 	service->properties = property_put(service->properties, "eventSubURL", url);
 }
 
 
 /* scpd */
 
-upnp_scpd_t * upnp_create_scpd(void) {
+upnp_scpd_t * upnp_create_scpd(void)
+{
 	upnp_scpd_t * scpd = (upnp_scpd_t*)malloc(sizeof(upnp_scpd_t));
 	memset(scpd, 0, sizeof(upnp_scpd_t));
 	return scpd;
 }
 
-void upnp_free_scpd(upnp_scpd_t * scpd) {
+void upnp_free_scpd(upnp_scpd_t * scpd)
+{
 	if (scpd == NULL) {
 		return;
 	}
@@ -249,13 +285,15 @@ void upnp_free_scpd(upnp_scpd_t * scpd) {
 
 /* action invoke */
 
-upnp_action_t * upnp_create_action(void) {
+upnp_action_t * upnp_create_action(void)
+{
 	upnp_action_t * action = (upnp_action_t*)malloc(sizeof(upnp_action_t));
 	memset(action, 0, sizeof(upnp_action_t));
 	return action;
 }
 
-void upnp_free_action(upnp_action_t * action) {
+void upnp_free_action(upnp_action_t * action)
+{
 	if (action == NULL) {
 		return;
 	}
@@ -264,13 +302,15 @@ void upnp_free_action(upnp_action_t * action) {
 	free(action);
 }
 
-upnp_action_request_t * upnp_create_action_request(void) {
+upnp_action_request_t * upnp_create_action_request(void)
+{
 	upnp_action_request_t * req = (upnp_action_request_t*)malloc(sizeof(upnp_action_request_t));
 	memset(req, 0, sizeof(upnp_action_request_t));
 	return req;
 }
 
-void upnp_free_action_request(upnp_action_request_t * request) {
+void upnp_free_action_request(upnp_action_request_t * request)
+{
 	if (request == NULL) {
 		return;
 	}
@@ -280,25 +320,30 @@ void upnp_free_action_request(upnp_action_request_t * request) {
 	free(request);
 }
 
-char * upnp_action_request_get_service_type(upnp_action_request_t * req) {
+char * upnp_action_request_get_service_type(upnp_action_request_t * req)
+{
 	return req->service_type;
 }
 
-void upnp_action_request_set_service_type(upnp_action_request_t * req, const char * type) {
+void upnp_action_request_set_service_type(upnp_action_request_t * req, const char * type)
+{
 	free(req->service_type);
 	req->service_type = strdup(type);
 }
 
-char * upnp_action_request_get_action_name(upnp_action_request_t * req) {
+char * upnp_action_request_get_action_name(upnp_action_request_t * req)
+{
 	return req->action_name;
 }
 
-void upnp_action_request_set_action_name(upnp_action_request_t * req, const char * name) {
+void upnp_action_request_set_action_name(upnp_action_request_t * req, const char * name)
+{
 	free(req->action_name);
 	req->action_name = strdup(name);
 }
 
-char * upnp_action_request_get(upnp_action_request_t * request, const char * name) {
+char * upnp_action_request_get(upnp_action_request_t * request, const char * name)
+{
 	list_t * lst = list_find(request->params, (void*)name, (_cmp_cb)name_value_cmp_name);
 	if (lst) {
 		name_value_t * nv = (name_value_t*)lst->data;
@@ -307,7 +352,8 @@ char * upnp_action_request_get(upnp_action_request_t * request, const char * nam
 	return NULL;
 }
 
-void upnp_action_request_put(upnp_action_request_t * request, const char * name, const char * value) {
+void upnp_action_request_put(upnp_action_request_t * request, const char * name, const char * value)
+{
 	list_t * lst = list_find(request->params, (void*)name, (_cmp_cb)name_value_cmp_name);
 	if (lst) {
 		name_value_t * nv = (name_value_t*)lst->data;
@@ -317,13 +363,15 @@ void upnp_action_request_put(upnp_action_request_t * request, const char * name,
 	}
 }
 
-upnp_action_response_t * upnp_create_action_response(void) {
+upnp_action_response_t * upnp_create_action_response(void)
+{
 	upnp_action_response_t * res = (upnp_action_response_t*)malloc(sizeof(upnp_action_response_t));
 	memset(res, 0, sizeof(upnp_action_response_t));
 	return res;
 }
 
-void upnp_free_action_response(upnp_action_response_t * response) {
+void upnp_free_action_response(upnp_action_response_t * response)
+{
 	if (response == NULL) {
 		return;
 	}
@@ -333,25 +381,30 @@ void upnp_free_action_response(upnp_action_response_t * response) {
 	free(response);
 }
 
-char * upnp_action_response_get_service_type(upnp_action_response_t * res) {
+char * upnp_action_response_get_service_type(upnp_action_response_t * res)
+{
 	return res->service_type;
 }
 
-void upnp_action_response_set_service_type(upnp_action_response_t * res, const char * type) {
+void upnp_action_response_set_service_type(upnp_action_response_t * res, const char * type)
+{
 	free(res->service_type);
 	res->service_type = strdup(type);
 }
 
-char * upnp_action_response_get_action_name(upnp_action_response_t * res) {
+char * upnp_action_response_get_action_name(upnp_action_response_t * res)
+{
 	return res->action_name;
 }
 
-void upnp_action_response_set_action_name(upnp_action_response_t * res, const char * name) {
+void upnp_action_response_set_action_name(upnp_action_response_t * res, const char * name)
+{
 	free(res->action_name);
 	res->action_name = strdup(name);
 }
 
-char * upnp_action_response_get(upnp_action_response_t * response, const char * name) {
+char * upnp_action_response_get(upnp_action_response_t * response, const char * name)
+{
 	list_t * lst = list_find(response->params, (void*)name, (_cmp_cb)name_value_cmp_name);
 	if (lst) {
 		name_value_t * nv = (name_value_t*)lst->data;
@@ -360,7 +413,8 @@ char * upnp_action_response_get(upnp_action_response_t * response, const char * 
 	return NULL;
 }
 
-void upnp_action_response_put(upnp_action_response_t * response, const char * name, const char * value) {
+void upnp_action_response_put(upnp_action_response_t * response, const char * name, const char * value)
+{
 	list_t * lst = list_find(response->params, (void*)name, (_cmp_cb)name_value_cmp_name);
 	if (lst) {
 		name_value_t * nv = (name_value_t*)lst->data;
@@ -374,13 +428,15 @@ void upnp_action_response_put(upnp_action_response_t * response, const char * na
 
 /* argument */
 
-upnp_argument_t * upnp_create_argument(void) {
+upnp_argument_t * upnp_create_argument(void)
+{
 	upnp_argument_t * argument = (upnp_argument_t*)malloc(sizeof(upnp_argument_t));
 	memset(argument, 0, sizeof(upnp_argument_t));
 	return argument;
 }
 
-void upnp_free_argument(upnp_argument_t * argument) {
+void upnp_free_argument(upnp_argument_t * argument)
+{
 	if (argument == NULL) {
 		return;
 	}
@@ -392,13 +448,15 @@ void upnp_free_argument(upnp_argument_t * argument) {
 
 /* state variable */
 
-upnp_state_variable_t * upnp_create_state_variable(void) {
+upnp_state_variable_t * upnp_create_state_variable(void)
+{
 	upnp_state_variable_t * state_variable = (upnp_state_variable_t*)malloc(sizeof(upnp_state_variable_t));
 	memset(state_variable, 0, sizeof(upnp_state_variable_t));
 	return state_variable;
 }
 
-void upnp_free_state_variable(upnp_state_variable_t * state_variable) {
+void upnp_free_state_variable(upnp_state_variable_t * state_variable)
+{
 	if (state_variable == NULL) {
 		return;
 	}
@@ -409,41 +467,49 @@ void upnp_free_state_variable(upnp_state_variable_t * state_variable) {
 	free(state_variable);
 }
 
-void upnp_state_variable_set_send_events(upnp_state_variable_t * state_variable, int yesno) {
+void upnp_state_variable_set_send_events(upnp_state_variable_t * state_variable, int yesno)
+{
 	state_variable->send_events = yesno;
 }
 
-int upnp_state_variable_get_send_events(upnp_state_variable_t * state_variable) {
+int upnp_state_variable_get_send_events(upnp_state_variable_t * state_variable)
+{
 	return state_variable->send_events;
 }
 
-void upnp_state_variable_set_multicast(upnp_state_variable_t * state_variable, int yesno) {
+void upnp_state_variable_set_multicast(upnp_state_variable_t * state_variable, int yesno)
+{
 	state_variable->multicast = yesno;
 }
 
-int upnp_state_variable_get_multicast(upnp_state_variable_t * state_variable) {
+int upnp_state_variable_get_multicast(upnp_state_variable_t * state_variable)
+{
 	return state_variable->multicast;
 }
 
-void upnp_state_variable_set_allowed_list(upnp_state_variable_t * state_variable, list_t * allowed_list) {
+void upnp_state_variable_set_allowed_list(upnp_state_variable_t * state_variable, list_t * allowed_list)
+{
 	state_variable->allowed_list = allowed_list;
 }
 
-list_t * upnp_state_variable_get_allowed_list(upnp_state_variable_t * state_variable) {
+list_t * upnp_state_variable_get_allowed_list(upnp_state_variable_t * state_variable)
+{
 	return state_variable->allowed_list;
 }
 
 
 /* upnp subscription */
 
-upnp_subscription_t * upnp_create_subscription(void) {
+upnp_subscription_t * upnp_create_subscription(void)
+{
 	upnp_subscription_t * subscription = (upnp_subscription_t*)malloc(sizeof(upnp_subscription_t));
 	memset(subscription, 0, sizeof(upnp_subscription_t));
 	upnp_subscription_update_tick(subscription);
 	return subscription;
 }
 
-void upnp_free_subscription(upnp_subscription_t * subscription) {
+void upnp_free_subscription(upnp_subscription_t * subscription)
+{
 	if (subscription == NULL) {
 		return;
 	}
@@ -452,36 +518,44 @@ void upnp_free_subscription(upnp_subscription_t * subscription) {
 	free(subscription);
 }
 
-void upnp_subscription_update_tick(upnp_subscription_t * subscription) {
+void upnp_subscription_update_tick(upnp_subscription_t * subscription)
+{
 	subscription->tick = tick_milli();
 }
 
-void upnp_subscription_set_timeout(upnp_subscription_t * subscription, unsigned long timeout) {
+void upnp_subscription_set_timeout(upnp_subscription_t * subscription, unsigned long timeout)
+{
 	subscription->timeout = timeout;
 }
 
-int upnp_subscription_expired(upnp_subscription_t * subscription) {
+int upnp_subscription_expired(upnp_subscription_t * subscription)
+{
 	return ((tick_milli() - subscription->tick) >= subscription->timeout);
 }
 
-int upnp_subscription_cmp_sid(upnp_subscription_t * subscription, const char * sid) {
+int upnp_subscription_cmp_sid(upnp_subscription_t * subscription, const char * sid)
+{
 	return strcmp(subscription->sid, sid);
 }
 
-char * upnp_subscription_get_url(upnp_subscription_t * subscription) {
+char * upnp_subscription_get_url(upnp_subscription_t * subscription)
+{
 	return subscription->url;
 }
 
-void upnp_subscription_set_url(upnp_subscription_t * subscription, const char * url) {
+void upnp_subscription_set_url(upnp_subscription_t * subscription, const char * url)
+{
 	free(subscription->url);
 	subscription->url = strdup(url);
 }
 
-char * upnp_subscription_get_sid(upnp_subscription_t * subscription) {
+char * upnp_subscription_get_sid(upnp_subscription_t * subscription)
+{
 	return subscription->sid;
 }
 
-void upnp_subscription_set_sid(upnp_subscription_t * subscription, const char * sid) {
+void upnp_subscription_set_sid(upnp_subscription_t * subscription, const char * sid)
+{
 	free(subscription->sid);
 	subscription->sid = strdup(sid);
 }

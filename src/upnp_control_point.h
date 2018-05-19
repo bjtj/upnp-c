@@ -40,6 +40,6 @@ extern upnp_subscription_t * upnp_control_point_get_subscription(upnp_control_po
 extern void upnp_control_point_add_subscription(upnp_control_point_t * cp, upnp_subscription_t * subscription);
 extern void upnp_control_point_remove_subscription(upnp_control_point_t * cp, upnp_subscription_t * subscription);
 extern upnp_subscription_t * upnp_control_point_subscribe(upnp_control_point_t * cp, const char * url);
-extern int upnp_control_point_unsubscribe(upnp_control_point_t * cp, upnp_subscription_t * subscription);
+extern int upnp_control_point_unsubscribe(upnp_control_point_t * cp, const char * sid);
 
 #endif

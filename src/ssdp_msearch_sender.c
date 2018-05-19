@@ -1,7 +1,8 @@
 #include "ssdp_msearch_sender.h"
 
 
-ssdp_msearch_sender_t * create_ssdp_msearch_sender(void) {
+ssdp_msearch_sender_t * create_ssdp_msearch_sender(void)
+{
 	ssdp_msearch_sender_t * sender = (ssdp_msearch_sender_t*)malloc(sizeof(ssdp_msearch_sender_t));
 	memset(sender, 0, sizeof(ssdp_msearch_sender_t));
 	sender->sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -11,7 +12,8 @@ ssdp_msearch_sender_t * create_ssdp_msearch_sender(void) {
 	return sender;
 }
 
-void ssdp_free_msearch_sender(ssdp_msearch_sender_t * sender) {
+void ssdp_free_msearch_sender(ssdp_msearch_sender_t * sender)
+{
 	close(sender->sock);
 	free(sender);
 }
@@ -42,7 +44,8 @@ void ssdp_send_msearch(ssdp_msearch_sender_t * sender, const char * type, int mx
 	sendto(sender->sock, buffer, strlen(buffer), 0, (struct sockaddr *)&addr, addr_len);
 }
 
-int ssdp_pending_msearch_sender(ssdp_msearch_sender_t * sender, unsigned long wait_milli) {
+int ssdp_pending_msearch_sender(ssdp_msearch_sender_t * sender, unsigned long wait_milli)
+{
 	fd_set fds = sender->read_fds;
 	struct timeval timeout;
 	timeout.tv_sec = wait_milli / 1000;
@@ -50,7 +53,8 @@ int ssdp_pending_msearch_sender(ssdp_msearch_sender_t * sender, unsigned long wa
 	return select(sender->sock + 1, &fds, NULL, NULL, &timeout);
 }
 
-void ssdp_receive_ssdp_response(ssdp_msearch_sender_t * sender) {
+void ssdp_receive_ssdp_response(ssdp_msearch_sender_t * sender)
+{
 	char buffer[SSDP_PACKET_MAX] = {0,};
 	struct sockaddr_in addr = {0,};
 	socklen_t addr_len = sizeof(addr);

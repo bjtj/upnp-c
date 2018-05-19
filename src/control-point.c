@@ -17,24 +17,29 @@
 #define STRNCMP(A, B) strncmp((A), (B), strlen((B)))
 
 
-typedef struct _session_t {
+typedef struct _session_t
+{
 	char * device;
 	char * service;
 	char * action;
 } session_t;
 
 
-static void on_device_added(upnp_device_t * device) {
+static void on_device_added(upnp_device_t * device)
+{
 	printf("[upnp] device added : %s\n", upnp_device_get_friendlyname(device));
 }
 
-static void on_device_removed(upnp_device_t * device) {
+static void on_device_removed(upnp_device_t * device)
+{
 	printf("[upnp] device removed : %s\n", upnp_device_get_friendlyname(device));
 }
 
-static void on_event(const char * sid, list_t * properties) {
+static void on_event(const char * sid, list_t * properties)
+{
 	printf("[event] sid: %s\n", sid);
-	for (; properties; properties = properties->next) {
+	for (; properties; properties = properties->next)
+	{
 		name_value_t * nv = (name_value_t*)properties->data;
 		printf("%s : %s\n", nv->name, nv->value);
 	}
@@ -54,7 +59,8 @@ int main(int argc, char *argv[])
 	upnp_control_point_set_on_event(cp, on_event);
 	upnp_control_point_start(cp);
 
-	while (1) {
+	while (1)
+	{
 		char line[1024] = {0,};
 		assert(fgets(line, sizeof(line), stdin) != NULL);
 		line[strlen(line) - 1] = '\0';
@@ -154,6 +160,13 @@ int main(int argc, char *argv[])
 				}
 				free(url);
 			}
+		} else if (strcmp(line, "subscriptions") == 0) {
+			list_t * lst = cp->subscriptions;
+			printf("[Subscriptions]\n");
+			for (; lst; lst = lst->next) {
+				upnp_subscription_t * subscription = (upnp_subscription_t*)lst->data;
+				printf(" * %s\n", subscription->sid);
+			}
 		} else if (strcmp(line, "subscribe") == 0) {
 			upnp_device_t * device = upnp_control_point_get_device(cp, session.device);
 			upnp_service_t * service = upnp_device_get_service(device, session.service);
@@ -162,8 +175,9 @@ int main(int argc, char *argv[])
 			upnp_subscription_t * subscription = upnp_control_point_subscribe(cp, url);
 			printf("[subscribe] sid: %s\n", subscription->sid);
 			free(url);
-			
-		} else if (strcmp(line, "unsubscribe") == 0) {
+		} else if (STRNCMP(line, "unsubscribe ") == 0) {
+			char * sid = line + strlen("unsubscribe ");
+			upnp_control_point_unsubscribe(cp, sid);
 		} else {
 			printf("[Error] Unknown command - '%s'\n", line);
 		}

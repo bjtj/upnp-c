@@ -1,6 +1,7 @@
 #include "clock.h"
 
-unsigned long tick_milli(void) {
+unsigned long tick_milli(void)
+{
 
 #if defined(__APPLE__) || defined(__MACH__)
         
