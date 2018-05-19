@@ -3,6 +3,7 @@
 
 #include "public.h"
 #include "ssdp.h"
+#include "ssdp_header.h"
 
 typedef struct _ssdp_receiver_t
 {
@@ -12,10 +13,7 @@ typedef struct _ssdp_receiver_t
 
 extern ssdp_receiver_t * create_ssdp_receiver(void);
 extern void free_ssdp_receiver(ssdp_receiver_t * receiver);
-extern int pending_ssdp_receiver(ssdp_receiver_t * receiver,
-								 unsigned long wait_milli);
-extern int receive_ssdp_packet(ssdp_receiver_t * receiver,
-							   char * buffer,
-							   size_t size);
+extern int pending_ssdp_receiver(ssdp_receiver_t * receiver, unsigned long wait_milli);
+extern ssdp_header_t * receive_ssdp_header(ssdp_receiver_t * receiver);
 
 #endif

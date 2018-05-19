@@ -51,10 +51,15 @@ int pending_ssdp_receiver(ssdp_receiver_t * receiver, unsigned long wait_milli) 
 	return select(receiver->sock + 1, &fds, NULL, NULL, &timeout);
 }
 
-int receive_ssdp_packet(ssdp_receiver_t * receiver, char * buffer, size_t size) {
+ssdp_header_t * receive_ssdp_header(ssdp_receiver_t * receiver) {
+	char buffer[SSDP_PACKET_MAX] = {0,};
 	struct sockaddr_in addr = {0,};
 	socklen_t addr_len = sizeof(addr);
-	int len = recvfrom(receiver->sock, buffer, size, 0, (struct sockaddr *)&addr, &addr_len);
-	assert(len > 0);
-	return len;
+	ssdp_header_t * ssdp = NULL;
+	int len;
+	len = recvfrom(receiver->sock, buffer, sizeof(buffer), 0, (struct sockaddr *)&addr, &addr_len);
+	if (len > 0) {
+		ssdp = read_ssdp_header(buffer);
+	}
+	return ssdp;
 }

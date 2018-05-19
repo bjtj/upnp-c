@@ -30,7 +30,7 @@ void ssdp_send_msearch(ssdp_msearch_sender_t * sender, const char * type, int mx
 	struct sockaddr_in addr;
 	socklen_t addr_len = sizeof(addr);
 
-	char buffer[4096] = {0,};
+	char buffer[SSDP_PACKET_MAX] = {0,};
 	snprintf(buffer, sizeof(buffer), SSDP_FMT,
 			 SSDP_HOST, SSDP_PORT, type, mx, "\"ssdp:discover\"");
 
@@ -51,12 +51,15 @@ int ssdp_pending_msearch_sender(ssdp_msearch_sender_t * sender, unsigned long wa
 }
 
 void ssdp_receive_ssdp_response(ssdp_msearch_sender_t * sender) {
-	char buffer[4096] = {0,};
+	char buffer[SSDP_PACKET_MAX] = {0,};
 	struct sockaddr_in addr = {0,};
 	socklen_t addr_len = sizeof(addr);
 	int len = recvfrom(sender->sock, buffer, sizeof(buffer), 0, (struct sockaddr *)&addr, &addr_len);
-	assert(len > 0);
 	if (sender->response_handler_cb) {
-		sender->response_handler_cb((struct sockaddr *)&addr, buffer, sender->user_data);
+		ssdp_header_t * ssdp = read_ssdp_header(buffer);
+		if (ssdp) {
+			sender->response_handler_cb((struct sockaddr *)&addr, ssdp, sender->user_data);
+			free_ssdp_header(ssdp);
+		}
 	}
 }

@@ -3,12 +3,12 @@
 
 #include "public.h"
 #include "ssdp.h"
+#include "ssdp_header.h"
 
-typedef void (*__ssdp_response_handler_cb)(struct sockaddr *, const char *, void *);
+typedef void (*__ssdp_response_handler_cb)(struct sockaddr *, ssdp_header_t *, void *);
 
 typedef struct _ssdp_msearch_sender_t
 {
-	
     int sock;
 	fd_set read_fds;
 	void * user_data;

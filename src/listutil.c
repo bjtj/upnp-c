@@ -48,16 +48,20 @@ list_t * list_add(list_t * lst, void * data) {
 	return lst;
 }
 
-list_t * list_remove(list_t * lst, list_t * node, _free_cb cb) {
+list_t * list_remove(list_t * lst, void * data, _free_cb cb) {
 	list_t * ptr = lst;
-	if (ptr == node) {
+	if (ptr == NULL) {
+		return NULL;
+	}
+	if (ptr->data == data) {
 		list_t * next = ptr->next;
-		list_free_node(node, cb);
+		list_free_node(ptr, cb);
 		return next;
 	}
 	for (; ptr && ptr->next; ptr = ptr->next) {
-		if (ptr->next == node) {
-			ptr->next = node->next;
+		if (ptr->next->data == data) {
+			list_t * node = ptr->next;
+			ptr->next = ptr->next->next;
 			list_free_node(node, cb);
 			break;
 		}

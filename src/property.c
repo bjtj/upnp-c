@@ -76,7 +76,7 @@ void property_add_attribute(property_t * prop, const char * name, const char * v
 void property_remove_attribute(property_t * prop, const char * name) {
 	list_t * lst = list_find(prop->attributes, (void*)name, (_cmp_cb)name_value_cmp_name);
 	if (lst) {
-		prop->attributes = list_remove(prop->attributes, lst, (_free_cb)free_name_value);
+		prop->attributes = list_remove(prop->attributes, lst->data, (_free_cb)free_name_value);
 	}
 }
 

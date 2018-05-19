@@ -19,7 +19,7 @@ extern size_t list_size(list_t * lst);
 extern list_t * list_find(list_t * lst, void * target, _cmp_cb cb);
 extern list_t * list_tail(list_t * lst);
 extern list_t * list_add(list_t * lst, void * data);
-extern list_t * list_remove(list_t * lst, list_t * node, _free_cb cb);
+extern list_t * list_remove(list_t * lst, void * data, _free_cb cb);
 extern void list_iter(list_t * lst, void * arg, _iter_cb cb);
 extern list_t * list_clear(list_t * lst, _free_cb cb);
 

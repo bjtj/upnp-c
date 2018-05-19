@@ -79,3 +79,37 @@ ssdp_header_t * read_ssdp_header(const char * str) {
 	}
 	return ssdp;
 }
+
+notify_type_e ssdp_header_get_nts(ssdp_header_t * ssdp) {
+	char * nts = ssdp_header_get_parameter(ssdp, "NTS");
+	if (nts == NULL) {
+		return NTS_UNKNOWN;
+	}
+	if (strcmp(nts, "ssdp:alive") == 0) {
+		return NTS_ALIVE;
+	} else if (strcmp(nts, "ssdp:update") == 0) {
+		return NTS_UPDATE;
+	} else if (strcmp(nts, "ssdp:byebye") == 0) {
+		return NTS_BYEBYE;
+	}
+	return NTS_UNKNOWN;
+}
+
+void ssdp_header_set_nts(ssdp_header_t * header, notify_type_e type) {
+	switch (type) {
+	case NTS_ALIVE: {
+		ssdp_header_set_parameter(header, "NTS", "ssdp:alive");
+		break;
+	}
+	case NTS_UPDATE: {
+		ssdp_header_set_parameter(header, "NTS", "ssdp:update");
+		break;
+	}
+	case NTS_BYEBYE: {
+		ssdp_header_set_parameter(header, "NTS", "ssdp:byebye");
+		break;
+	}
+	default:
+		break;
+	}
+}

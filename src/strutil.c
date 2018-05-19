@@ -111,3 +111,10 @@ char * find_first_not(const char * str, const char * t) {
 	}
 	return NULL;
 }
+
+char * strdup_quiet(const char * str) {
+	if (str) {
+		return strdup(str);
+	}
+	return NULL;
+}

@@ -15,8 +15,12 @@
 static void _on_device_added(upnp_control_point_t * cp, upnp_device_t * device);
 static void _on_device_removed(upnp_control_point_t * cp, upnp_device_t * device);
 static void _on_event(upnp_control_point_t * cp, const char * sid, list_t * props);
+static upnp_device_t * _get_device_from_ssdp(ssdp_header_t * ssdp);
+static int _contains_usn(upnp_control_point_t * cp, const char * usn_str);
+static void _add_device(upnp_control_point_t * cp, upnp_device_t * device);
+static void _remove_device(upnp_control_point_t * cp, upnp_device_t * device);
 static void * _ssdp_receiver(void * arg);
-static void _ssdp_response_handler(struct sockaddr *, const char *, void *);
+static void _ssdp_response_handler(struct sockaddr * addr, ssdp_header_t * ssdp, void * userdata);
 static http_response_t * _http_server_handler(http_server_t * server, http_server_request_t * req);
 
 
@@ -36,7 +40,7 @@ void upnp_free_control_point(upnp_control_point_t * cp) {
 }
 
 void upnp_control_point_start(upnp_control_point_t * cp) {
-	assert(pthread_create(&cp->ssdp_receiver_thread, NULL, &_ssdp_receiver, &cp) == 0);
+	assert(pthread_create(&cp->ssdp_receiver_thread, NULL, &_ssdp_receiver, cp) == 0);
 	start_http_server(cp->http_server);
 }
 
@@ -57,8 +61,7 @@ void upnp_control_point_resolve_expired(upnp_control_point_t * cp) {
 		upnp_device_t * device = (upnp_device_t*)lst->data;
 		if (upnp_device_expired(device)) {
 			list_t * next = lst->next;
-			_on_device_removed(cp, device);
-			cp->devices = list_remove(cp->devices, lst, (_free_cb)upnp_free_device);
+			_remove_device(cp, device);
 			lst = next;
 		} else {
 			lst = lst->next;
@@ -196,9 +199,34 @@ void * _ssdp_receiver(void * arg) {
 	while (!cp->done)
 	{
 		if (pending_ssdp_receiver(ssdp_receiver, 1000)) {
-			char buffer[4096] = {0,};
-			receive_ssdp_packet(ssdp_receiver, buffer, sizeof(buffer));
-			ssdp_header_t * ssdp = read_ssdp_header(buffer);
+			ssdp_header_t * ssdp = receive_ssdp_header(ssdp_receiver);
+			if (ssdp == NULL) {
+				continue;
+			}
+			notify_type_e nts = ssdp_header_get_nts(ssdp);
+			switch (nts) {
+			case NTS_ALIVE: {
+				if (_contains_usn(cp, ssdp_header_get_parameter(ssdp, "USN")) == 0) {
+					upnp_device_t * device = _get_device_from_ssdp(ssdp);
+					_add_device(cp, device);
+				}
+				break;
+			}
+			case NTS_UPDATE: {
+				break;
+			}
+			case NTS_BYEBYE: {
+				if (_contains_usn(cp, ssdp_header_get_parameter(ssdp, "USN")) == 1) {
+					upnp_usn_t * usn = upnp_read_usn(ssdp_header_get_parameter(ssdp, "USN"));
+					upnp_device_t * device = upnp_control_point_get_device(cp, usn->udn);
+					_remove_device(cp, device);
+					free(usn);
+				}
+				break;
+			}
+			default:
+				break;
+			}
 			free_ssdp_header(ssdp);
 		}
 	}
@@ -206,56 +234,104 @@ void * _ssdp_receiver(void * arg) {
 	return NULL;
 }
 
-void _ssdp_response_handler(struct sockaddr * addr, const char * ssdp, void * user_data) {
-	upnp_control_point_t * cp = (upnp_control_point_t*)user_data;
-	ssdp_header_t * ssdp_header = read_ssdp_header(ssdp);
-	upnp_device_t * device;
-	char * xml = NULL;
-	char * location;
-	upnp_usn_t * usn;
-	http_response_t * response;
-	usn = upnp_read_usn(ssdp_header_get_parameter(ssdp_header, "USN"));
-	location = ssdp_header_get_parameter(ssdp_header, "LOCATION");
-	if (list_find(cp->devices, (void*)usn->udn, (_cmp_cb)upnp_device_cmp_udn)) {
-		// [ignore] already exists
-		upnp_free_usn(usn);
-		return;
+upnp_device_t * _get_device_from_ssdp(ssdp_header_t * ssdp)
+{
+	upnp_device_t * device = NULL;
+	char * location = NULL;
+	
+	location = ssdp_header_get_parameter(ssdp, "LOCATION");
+	if (location == NULL) {
+		return NULL;
 	}
-	upnp_free_usn(usn);
-	response = http_client_get_dump(location, NULL);
-	xml = strdup(response->data);
-	free_http_response(response);
-	if (xml == NULL) {
-		fprintf(stderr, "get dump null\n");
-		return;
-	}
-	device = upnp_read_device_xml(xml);
-	if (device == NULL) {
-		free(xml);
-		fprintf(stderr, "read device xml null\n");
-		return;
-	}
-	free(xml);
 
-	list_t * lst = device->services;
-	for (; lst; lst = lst->next) {
-		upnp_service_t * service = (upnp_service_t*)lst->data;
-		const char * scpd_url = upnp_service_get_scpd_url(service);
-		if (scpd_url == NULL) {
-			continue;
+	{
+		http_response_t * response = http_client_get_dump(location, NULL);
+		char * xml = response->data;
+		if (xml == NULL) {
+			fprintf(stderr, "get dump null\n");
+			free_http_response(response);
+			return NULL;
 		}
-		char * url = url_relative(location, scpd_url);
-		response = http_client_get_dump(url, NULL);
-		xml = strdup(response->data);
+		device = upnp_read_device_xml(xml);
+		if (device == NULL) {
+			fprintf(stderr, "read device xml null\n");
+			free_http_response(response);
+			return NULL;
+		}
+		upnp_device_set_base_url(device, location);
 		free_http_response(response);
-		if (xml) {
-			upnp_scpd_t * scpd = upnp_read_scpd_xml(xml);
-			service->scpd = scpd;
-		}
-		free(xml);
-		free(url);
 	}
-	upnp_device_set_base_url(device, location);
+	
+	{
+		list_t * lst = device->services;
+		for (; lst; lst = lst->next) {
+			upnp_service_t * service = (upnp_service_t*)lst->data;
+			const char * scpd_url = upnp_service_get_scpd_url(service);
+			if (scpd_url == NULL) {
+				continue;
+			}
+			char * url = url_relative(location, scpd_url);
+			http_response_t * response = http_client_get_dump(url, NULL);
+			free(url);
+			{
+				char * xml = response->data;
+				if (xml) {
+					upnp_scpd_t * scpd = upnp_read_scpd_xml(xml);
+					service->scpd = scpd;
+				}
+			}
+			free_http_response(response);
+		}
+	}
+
+	return device;
+}
+
+int _contains_usn(upnp_control_point_t * cp, const char * usn_str) {
+	int ret = 0;
+	upnp_usn_t * usn = upnp_read_usn(usn_str);
+	if (usn == NULL) {
+		return 0;
+	}
+	
+	if (list_find(cp->devices, (void*)usn->udn, (_cmp_cb)upnp_device_cmp_udn)) {
+		ret = 1;
+	}
+	
+	upnp_free_usn(usn);
+	return ret;
+}
+
+void _add_device(upnp_control_point_t * cp, upnp_device_t * device)
+{
+	cp->devices = list_add(cp->devices, device);
+	_on_device_added(cp, device);
+}
+
+void _remove_device(upnp_control_point_t * cp, upnp_device_t * device)
+{
+	_on_device_removed(cp, device);
+	cp->devices = list_remove(cp->devices, (void*)device, (_free_cb)upnp_free_device);	
+}
+
+void _ssdp_response_handler(struct sockaddr * addr, ssdp_header_t * ssdp, void * userdata)
+{
+	upnp_control_point_t * cp = (upnp_control_point_t*)userdata;
+	upnp_device_t * device = NULL;
+
+	if (ssdp == NULL) {
+		return;
+	}
+
+	if (_contains_usn(cp, ssdp_header_get_parameter(ssdp, "USN")) == 1) {
+		return;
+	}
+
+	device = _get_device_from_ssdp(ssdp);
+	if (device == NULL) {
+		return;
+	}
+	
 	cp->devices = list_add(cp->devices, device);
 	_on_device_added(cp, device);
 }
@@ -273,7 +349,8 @@ http_response_t * _http_server_handler(http_server_t * server, http_server_reque
 		properties = upnp_read_propertyset(req->data);
 		_on_event(cp, sid, properties);
 		list_clear(properties, (_free_cb)free_name_value);
-		/* http response ok */
+		
+		/* http response ok */		
 		snprintf(firstline, sizeof(firstline), "HTTP/1.1 200 OK");
 		res = create_http_response();
 		http_response_set_firstline(res, firstline);
