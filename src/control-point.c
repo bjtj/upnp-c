@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 	upnp_control_point_set_on_event(cp, on_event);
 	upnp_control_point_start(cp);
 
+	printf("(help|h)\n");
 	while (1)
 	{
 		char line[1024] = {0,};
@@ -66,13 +67,29 @@ int main(int argc, char *argv[])
 		line[strlen(line) - 1] = '\0';
 		if (strlen(line) == 0) {
 			char * ipv4 = get_ipv4();
-			printf("ipv4: %s\n", ipv4);
+			printf("[Info]\n");
+			printf(" * ipv4: %s\n", ipv4);
 			printf("[selection]\n");
-			printf("device: %s\n", session.device);
-			printf("service: %s\n", session.service);
-			printf("action: %s\n", session.action);
+			printf(" * device: %s\n", session.device);
+			printf(" * service: %s\n", session.service);
+			printf(" * action: %s\n", session.action);
 			printf("\n");
 			free(ipv4);
+		} else if (strcmp(line, "help") == 0 || strcmp(line, "h") == 0) {
+			printf("[Help]\n");
+			printf("Available commands:\n");
+			printf(" * help | h\n");
+			printf(" * quit | q\n");
+			printf(" * search <type>\n");
+			printf(" * ls \n");
+			printf(" * device <udn>\n");
+			printf(" * service <service type>\n");
+			printf(" * action <action name>\n");
+			printf(" * invoke\n");
+			printf(" * subscriptions\n");
+			printf(" * subscribe\n");
+			printf(" * unsubscribe\n");
+			printf("\n");
 		} else if (strcmp(line, "quit") == 0 || strcmp(line, "q") == 0) {
 			printf("[quit]\n");
 			break;
@@ -190,7 +207,7 @@ int main(int argc, char *argv[])
 	free(session.service);
 	free(session.action);
 
-	printf("[done] bye\n");
+	printf("Bye\n");
     return 0;
 }
 
