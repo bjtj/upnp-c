@@ -1,5 +1,10 @@
 #include "clock.h"
 
+#if defined(__APPLE__) || defined(__MACH__)
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
 unsigned long tick_milli(void)
 {
 
