@@ -23,5 +23,7 @@ extern char * strstr_last(const char * str, const char * pat);
 extern char * find_first(const char * str, const char * t);
 extern char * find_first_not(const char * str, const char * t);
 extern char * strdup_silent(const char * str);
+extern int ends_with(const char * str, const char * query);
+extern int starts_with(const char * str, const char * query);
 
 #endif

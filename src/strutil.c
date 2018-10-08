@@ -131,3 +131,36 @@ char * strdup_silent(const char * str)
 	}
 	return NULL;
 }
+
+int ends_with(const char * str, const char * query)
+{
+	if (strlen(str) < strlen(query)) {
+		return 0;
+	}
+
+	const char * ptr = str + (strlen(str) - strlen(query));
+	while (*ptr) {
+		if (*ptr != *query) {
+			return 0;
+		}
+		ptr++;
+		query++;
+	}
+	return 1;
+}
+
+int starts_with(const char * str, const char * query)
+{
+	if (strlen(str) < strlen(query)) {
+		return 0;
+	}
+
+	while (*query) {
+		if (*str != *query) {
+			return 0;
+		}
+		str++;
+		query++;
+	}
+	return 1;
+}

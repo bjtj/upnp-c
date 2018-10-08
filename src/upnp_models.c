@@ -154,6 +154,108 @@ list_t * upnp_device_get_all_usns(upnp_device_t * device)
 	return usn_list;
 }
 
+upnp_device_t * upnp_device_get_device_with_type(upnp_device_t * device, const char * type)
+{
+	const char * device_type = upnp_device_get_device_type(device);
+	if (strcmp(device_type, type) == 0) {
+		return device;
+	}
+
+	list_t * embedded_device_node = device->embedded_devices;
+	for (; embedded_device_node; embedded_device_node = embedded_device_node->next) {
+		upnp_device_t * embedded_device = (upnp_device_t*)embedded_device_node->data;
+		upnp_device_t * found = upnp_device_get_device_with_type(embedded_device, type);
+		if (found) {
+			return found;
+		}
+	}
+
+	return NULL;
+}
+
+upnp_service_t * upnp_device_get_service_with_type(upnp_device_t * device, const char * type)
+{
+	list_t * service = device->services;
+	for (; service; service = service->next) {
+		const char * service_type = upnp_service_get_type((upnp_service_t*)service->data);
+		if (strcmp(service_type, type) == 0) {
+			return (upnp_service_t*)service->data;
+		}
+	}
+
+	list_t * embedded_device_node = device->embedded_devices;
+	for (; embedded_device_node; embedded_device_node = embedded_device_node->next) {
+		upnp_device_t * embedded_device = (upnp_device_t*)embedded_device_node->data;
+		upnp_service_t * service = upnp_device_get_service_with_type(embedded_device, type);
+		if (service) {
+			return service;
+		}
+	}
+	return NULL;
+}
+
+upnp_service_t * upnp_device_get_service_with_scpdurl(upnp_device_t * device, const char * scpdurl)
+{
+	list_t * service = device->services;
+	for (; service; service = service->next) {
+		const char * service_type = upnp_service_get_scpd_url((upnp_service_t*)service->data);
+		if (strcmp(service_type, scpdurl) == 0) {
+			return (upnp_service_t*)service->data;
+		}
+	}
+
+	list_t * embedded_device_node = device->embedded_devices;
+	for (; embedded_device_node; embedded_device_node = embedded_device_node->next) {
+		upnp_device_t * embedded_device = (upnp_device_t*)embedded_device_node->data;
+		upnp_service_t * service = upnp_device_get_service_with_scpdurl(embedded_device, scpdurl);
+		if (service) {
+			return service;
+		}
+	}
+	return NULL;
+}
+
+upnp_service_t * upnp_device_get_service_with_controlurl(upnp_device_t * device, const char * controlurl)
+{
+	list_t * service = device->services;
+	for (; service; service = service->next) {
+		const char * service_type = upnp_service_get_scpd_url((upnp_service_t*)service->data);
+		if (strcmp(service_type, controlurl) == 0) {
+			return (upnp_service_t*)service->data;
+		}
+	}
+
+	list_t * embedded_device_node = device->embedded_devices;
+	for (; embedded_device_node; embedded_device_node = embedded_device_node->next) {
+		upnp_device_t * embedded_device = (upnp_device_t*)embedded_device_node->data;
+		upnp_service_t * service = upnp_device_get_service_with_controlurl(embedded_device, controlurl);
+		if (service) {
+			return service;
+		}
+	}
+	return NULL;
+}
+
+upnp_service_t * upnp_device_get_service_with_eventsuburl(upnp_device_t * device, const char * eventsuburl)
+{
+	list_t * service = device->services;
+	for (; service; service = service->next) {
+		const char * service_type = upnp_service_get_scpd_url((upnp_service_t*)service->data);
+		if (strcmp(service_type, eventsuburl) == 0) {
+			return (upnp_service_t*)service->data;
+		}
+	}
+
+	list_t * embedded_device_node = device->embedded_devices;
+	for (; embedded_device_node; embedded_device_node = embedded_device_node->next) {
+		upnp_device_t * embedded_device = (upnp_device_t*)embedded_device_node->data;
+		upnp_service_t * service = upnp_device_get_service_with_eventsuburl(embedded_device, eventsuburl);
+		if (service) {
+			return service;
+		}
+	}
+	return NULL;
+}
 
 /* service */
 

@@ -109,6 +109,11 @@ extern void upnp_device_set_control_url(upnp_device_t * device, const char * url
 extern void upnp_device_set_subscribe_url(upnp_device_t * device, const char * url);
 extern upnp_service_t * upnp_device_get_service(upnp_device_t * device, const char * type);
 extern list_t * upnp_device_get_all_usns(upnp_device_t * device);
+extern upnp_device_t * upnp_device_get_device_with_type(upnp_device_t * device, const char * type);
+extern upnp_service_t * upnp_device_get_service_with_type(upnp_device_t * device, const char * type);
+extern upnp_service_t * upnp_device_get_service_with_scpdurl(upnp_device_t * device, const char * scpdurl);
+extern upnp_service_t * upnp_device_get_service_with_controlurl(upnp_device_t * device, const char * controlurl);
+extern upnp_service_t * upnp_device_get_service_with_eventsuburl(upnp_device_t * device, const char * eventsuburl);
 
 // sevice
 extern upnp_service_t * upnp_create_service(void);

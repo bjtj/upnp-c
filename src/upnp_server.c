@@ -68,7 +68,7 @@ void * _ssdp_receiver(void * arg)
 
 http_response_t * _http_server_handler(http_server_t * server, http_server_request_t * req)
 {
-	if (strcmp(req->path, "/event") == 0) {
+	if (ends_with(req->path, "device.xml")) {
 		char firstline[1024] = {0,};
 		http_response_t * res;
 
@@ -77,6 +77,8 @@ http_response_t * _http_server_handler(http_server_t * server, http_server_reque
 		res = create_http_response();
 		http_response_set_firstline(res, firstline);
 		return res;
+	} else {
+		
 	}
 	
 	return NULL;
