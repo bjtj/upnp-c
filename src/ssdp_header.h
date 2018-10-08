@@ -9,6 +9,8 @@
 
 typedef struct _ssdp_header_t
 {
+	struct sockaddr * remote_addr;
+	socklen_t remote_addr_len;
 	char * firstline;
 	list_t * parameters;
 } ssdp_header_t;
@@ -22,5 +24,6 @@ extern name_value_t * read_ssdp_header_parameter(str_t line);
 extern ssdp_header_t * read_ssdp_header(const char * str);
 extern notify_type_e ssdp_header_get_nts(ssdp_header_t * header);
 extern void ssdp_header_set_nts(ssdp_header_t * header, notify_type_e type);
+extern ssdp_type_e ssdp_header_get_type(ssdp_header_t * header);
 
 #endif

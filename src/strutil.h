@@ -22,6 +22,6 @@ extern int strcmp_ignorecase(char const * a, char const * b);
 extern char * strstr_last(const char * str, const char * pat);
 extern char * find_first(const char * str, const char * t);
 extern char * find_first_not(const char * str, const char * t);
-extern char * strdup_quiet(const char * str);
+extern char * strdup_silent(const char * str);
 
 #endif

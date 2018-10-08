@@ -95,3 +95,12 @@ list_t * list_clear(list_t * lst, _free_cb cb)
 	}
 	return NULL;
 }
+
+list_t * list_append_list(list_t * dest, list_t * list)
+{
+	if (dest == NULL) {
+		return list;
+	}
+	list_tail(dest)->next = list;
+	return dest;
+}

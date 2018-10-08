@@ -1,4 +1,5 @@
 #include "upnp_models.h"
+#include "upnp_usn.h"
 #include "clock.h"
 
 
@@ -72,6 +73,15 @@ const char * upnp_device_get_friendlyname(upnp_device_t * device)
 	return NULL;
 }
 
+const char * upnp_device_get_device_type(upnp_device_t * device)
+{
+	property_t * prop = property_get(device->properties, "deviceType");
+	if (prop) {
+		return property_get_value(prop);
+	}
+	return NULL;
+}
+
 void upnp_device_add_child_device(upnp_device_t * device, upnp_device_t * child_device)
 {
 	device->embedded_devices = list_add(device->embedded_devices, child_device);
@@ -113,6 +123,35 @@ upnp_service_t * upnp_device_get_service(upnp_device_t * device, const char * ty
 		return (upnp_service_t*)find->data;
 	}
 	return NULL;
+}
+
+list_t * upnp_device_get_all_usns(upnp_device_t * device)
+{
+	list_t * usn_list = NULL;
+	const char * udn = upnp_device_get_udn(device);
+	const char * device_type = upnp_device_get_device_type(device);
+	usn_list = list_add(usn_list, (void*)upnp_create_usn_with_init(udn, device_type));
+	list_t * service_node = device->services;
+	while (service_node) {
+		upnp_service_t * service = (upnp_service_t*)service_node->data;
+		const char * service_type = upnp_service_get_type(service);
+		usn_list = list_add(usn_list, upnp_create_usn_with_init(udn, service_type));
+		service_node = service_node->next;
+	}
+
+	list_t * device_node = device->embedded_devices;
+	while (device_node) {
+		upnp_device_t * embedded_device = (upnp_device_t*)device_node->data;
+		list_t * usns = upnp_device_get_all_usns(embedded_device);
+		list_t * usn = usns;
+		for (; usn; usn = usn->next) {
+			upnp_usn_set_udn(((upnp_usn_t*)usn->data), udn);
+		}
+		usn_list = list_append_list(usn_list, usns);
+		device_node = device_node->next;
+	}
+	
+	return usn_list;
 }
 
 

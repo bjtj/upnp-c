@@ -63,6 +63,9 @@ ssdp_header_t * receive_ssdp_header(ssdp_receiver_t * receiver)
 	len = recvfrom(receiver->sock, buffer, sizeof(buffer), 0, (struct sockaddr *)&addr, &addr_len);
 	if (len > 0) {
 		ssdp = read_ssdp_header(buffer);
+		ssdp->remote_addr = (struct sockaddr*)malloc(addr_len);
+		memcpy(ssdp->remote_addr, &addr, addr_len);
+		ssdp->remote_addr_len = addr_len;
 	}
 	return ssdp;
 }

@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
 	upnp_control_point_set_on_event(cp, on_event);
 	upnp_control_point_start(cp);
 
+	printf("upnp control point\n");
+
 	while (1)
 	{
 		char line[1024] = {0,};

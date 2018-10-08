@@ -11,6 +11,9 @@ ssdp_header_t * create_ssdp_header(void)
 
 void free_ssdp_header(ssdp_header_t * ssdp)
 {
+	if (ssdp->remote_addr) {
+		free(ssdp->remote_addr);
+	}
 	free(ssdp->firstline);
 	list_clear(ssdp->parameters, (_free_cb)free_name_value);
 	free(ssdp);
@@ -120,4 +123,26 @@ void ssdp_header_set_nts(ssdp_header_t * header, notify_type_e type)
 	default:
 		break;
 	}
+}
+
+ssdp_type_e ssdp_header_get_type(ssdp_header_t * header)
+{
+	if (header->firstline == NULL)
+	{
+		return SSDP_UNKNOWN;
+	}
+
+	if (strstr(header->firstline, "M-SEARCH") == header->firstline) {
+		return SSDP_MSEARCH;
+	}
+
+	if (strstr(header->firstline, "NOTIFY") == header->firstline) {
+		return SSDP_NOTIFY;
+	}
+
+	if (strstr(header->firstline, "HTTP/") == header->firstline) {
+		return SSDP_RESPONSE;
+	}
+
+	return SSDP_UNKNOWN;
 }

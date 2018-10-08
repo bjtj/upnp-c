@@ -22,5 +22,6 @@ extern list_t * list_add(list_t * lst, void * data);
 extern list_t * list_remove(list_t * lst, void * data, _free_cb cb);
 extern void list_iter(list_t * lst, void * arg, _iter_cb cb);
 extern list_t * list_clear(list_t * lst, _free_cb cb);
+extern list_t * list_append_list(list_t * dest, list_t * list);
 
 #endif

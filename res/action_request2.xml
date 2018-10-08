@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+			xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <!-- POST /e399855c-7ecb-1fff-8000-000000000000/urn:schemas-upnp-org:service:SwitchPower:1/control.xml HTTP/1.1 -->
+  <!-- SOAPACTION: "urn:schemas-upnp-org:service:SwitchPower:1#SetTarget" -->
+  <!-- Host: 172.17.0.2:9001 -->
+  <!-- Content-Length: 321 -->
+  <s:Body>
+	<u:SetTarget xmlns:u="urn:schemas-upnp-org:service:SwitchPower:1">
+	  <newTargetValue>10</newTargetValue>
+	</u:SetTarget>
+  </s:Body>
+
+</s:Envelope>
+
+
