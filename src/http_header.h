@@ -8,7 +8,7 @@
 
 typedef struct _http_header_t
 {
-    char * firstline;
+  char * firstline;
 	list_t * parameters;
 } http_header_t;
 

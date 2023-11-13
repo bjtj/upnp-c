@@ -26,7 +26,7 @@ name_value_t * http_header_read_parameter(str_t * str)
 		str_t name = strutil_trim(strutil_str(str->begin, sep));
 		str_t value = strutil_trim(strutil_str(sep+1, str->end));
 		return create_name_value_with_namevalue_nocopy(strutil_dup_cstr(&name),
-													   strutil_dup_cstr(&value));
+                                                   strutil_dup_cstr(&value));
 	}
 	return NULL;
 }
@@ -61,7 +61,7 @@ void http_header_set_parameter_nocopy(http_header_t * header, char * name, char 
 		name_value_set_value_nocopy(nv, value);
 	}
 	header->parameters = list_add(header->parameters,
-								  create_name_value_with_namevalue_nocopy(name, value));
+                                create_name_value_with_namevalue_nocopy(name, value));
 }
 
 char * http_header_get_firstline(http_header_t * header)

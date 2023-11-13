@@ -7,7 +7,7 @@
 
 typedef struct _ssdp_receiver_t
 {
-    int sock;
+  int sock;
 	fd_set read_fds;
 } ssdp_receiver_t;
 

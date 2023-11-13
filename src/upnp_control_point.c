@@ -116,8 +116,8 @@ void upnp_control_point_send_msearch(upnp_control_point_t * cp, const char * typ
 upnp_device_t * upnp_control_point_get_device(upnp_control_point_t * cp, const char * udn)
 {
 	list_t * find = list_find(upnp_control_point_get_devices(cp),
-							  (void*)udn,
-							  (_cmp_cb)upnp_device_cmp_udn);
+                            (void*)udn,
+                            (_cmp_cb)upnp_device_cmp_udn);
 	if (find) {
 		return (upnp_device_t*)find->data;
 	}

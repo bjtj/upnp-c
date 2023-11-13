@@ -4,7 +4,7 @@
 
 typedef struct _data_t
 {
-    char * buffer;
+  char * buffer;
 	int buffer_size;
 	int pos;
 } data_t;
@@ -111,7 +111,7 @@ done:
 
 
 http_response_t * http_client_post(const char * url, list_t * parameters,
-								   const char * type, const char * text)
+                                   const char * type, const char * text)
 {
 	struct curl_slist * headers = NULL;
 	CURLcode res;

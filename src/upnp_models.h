@@ -13,7 +13,7 @@ typedef enum _upnp_direction_e
 
 typedef struct _upnp_range
 {
-    int minimum;
+  int minimum;
 	int maximum;
 	int step;
 } upnp_range;
@@ -69,14 +69,14 @@ typedef struct _upnp_device_t
 typedef struct _upnp_action_request_t
 {
 	char * service_type;
-    char * action_name;
+  char * action_name;
 	list_t * params;
 } upnp_action_request_t;
 
 typedef struct _upnp_action_response_t
 {
 	char * service_type;
-    char * action_name;
+  char * action_name;
 	list_t * params;
 } upnp_action_response_t;
 
@@ -86,7 +86,7 @@ typedef struct _upnp_subscription_t
 	unsigned long tick;
 	unsigned long timeout;
 	char * url;
-    char * sid;
+  char * sid;
 } upnp_subscription_t;
 
 
@@ -153,8 +153,8 @@ extern char * upnp_action_request_get_action_name(upnp_action_request_t * req);
 extern void upnp_action_request_set_action_name(upnp_action_request_t * req, const char * name);
 extern char * upnp_action_request_get(upnp_action_request_t * request, const char * name);
 extern void upnp_action_request_put(upnp_action_request_t * request,
-									const char * name,
-									const char * value);
+                                    const char * name,
+                                    const char * value);
 
 extern upnp_action_response_t * upnp_create_action_response(void);
 extern void upnp_free_action_response(upnp_action_response_t * response);
@@ -164,8 +164,8 @@ extern char * upnp_action_response_get_action_name(upnp_action_response_t * res)
 extern void upnp_action_response_set_action_name(upnp_action_response_t * res, const char * name);
 extern char * upnp_action_response_get(upnp_action_response_t * response, const char * name);
 extern void upnp_action_response_put(upnp_action_response_t * response,
-									 const char * name,
-									 const char * value);
+                                     const char * name,
+                                     const char * value);
 
 
 // argument

@@ -10,7 +10,7 @@ typedef void (*cb_on_action_request)(upnp_action_request_t *, upnp_action_respon
 typedef struct _upnp_server_t
 {
 	int done;
-    int port;
+  int port;
 	list_t * devices;
 	pthread_t ssdp_receiver_thread;
 	http_server_t * http_server;

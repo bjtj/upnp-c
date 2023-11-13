@@ -1,4 +1,4 @@
-add_library (upnp-c SHARED
+add_library (libupnp-c SHARED
   clock.c
   clock.h
   http_client.c
@@ -42,8 +42,8 @@ add_library (upnp-c SHARED
   urlutil.c
   urlutil.h)
 
-target_include_directories(upnp-c PRIVATE .)
-install(TARGETS upnp-c DESTINATION lib)
+target_include_directories(libupnp-c PRIVATE .)
+install(TARGETS libupnp-c DESTINATION lib)
 install(FILES clock.h
   http_client.h
   http_header.h
@@ -75,7 +75,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules (DEP REQUIRED libmicrohttpd libcurl libxml-2.0)
 
 # link libraries
-target_link_libraries (upnp-c ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries (upnp-c ${DEP_LIBRARIES})
-target_include_directories (upnp-c PUBLIC ${DEP_INCLUDE_DIRS})
-target_compile_options (upnp-c PUBLIC ${DEP_CFLAGS_OTHER})
+target_link_libraries (libupnp-c ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (libupnp-c ${DEP_LIBRARIES})
+target_include_directories (libupnp-c PUBLIC ${DEP_INCLUDE_DIRS})
+target_compile_options (libupnp-c PUBLIC ${DEP_CFLAGS_OTHER})

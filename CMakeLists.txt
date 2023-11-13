@@ -10,4 +10,4 @@ add_test(NAME upnp-c-test COMMAND upnp-c-test)
 # executable
 add_executable (control-point src/control-point.c)
 add_executable (server src/server.c)
-target_link_libraries(control-point upnp-c)
+target_link_libraries(control-point libupnp-c)

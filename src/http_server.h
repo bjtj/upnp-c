@@ -8,7 +8,7 @@
 
 typedef struct _http_server_request_t
 {
-    const char * method;
+  const char * method;
 	const char * path;
 	http_header_t * header;
 	const char * data;
@@ -19,7 +19,7 @@ typedef struct _http_server_request_t
 struct _http_server_t;
 
 typedef http_response_t * (*http_server_handler_cb)(struct _http_server_t *,
-													http_server_request_t *);
+                                                    http_server_request_t *);
 
 typedef struct _http_server_t
 {

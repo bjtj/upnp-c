@@ -9,7 +9,7 @@ typedef void (*__ssdp_response_handler_cb)(struct sockaddr *, ssdp_header_t *, v
 
 typedef struct _ssdp_msearch_sender_t
 {
-    int sock;
+  int sock;
 	fd_set read_fds;
 	void * user_data;
 	__ssdp_response_handler_cb response_handler_cb;

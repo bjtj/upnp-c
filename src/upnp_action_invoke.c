@@ -11,8 +11,8 @@ upnp_action_response_t * upnp_action_invoke(const char * url, upnp_action_reques
 	list_t * headers = NULL;
 	char soapaction[1024] = {0,};
 	snprintf(soapaction, sizeof(soapaction), "\"%s#%s\"",
-			 upnp_action_request_get_service_type(request),
-			 upnp_action_request_get_action_name(request));
+           upnp_action_request_get_service_type(request),
+           upnp_action_request_get_action_name(request));
 	headers = list_add(headers, create_name_value_with_namevalue("SOAPACTION", soapaction));
 	res = http_client_post(url, headers, "text/xml", xml);
 	response = upnp_read_action_response(res->data);

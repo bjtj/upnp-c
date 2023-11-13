@@ -22,8 +22,8 @@ void free_ssdp_header(ssdp_header_t * ssdp)
 char * ssdp_header_get_parameter(ssdp_header_t * header, const char * name)
 {
 	list_t * find = list_find(header->parameters,
-							  (void*)name,
-							  (_cmp_cb)name_value_cmp_name_ignorecase);
+                            (void*)name,
+                            (_cmp_cb)name_value_cmp_name_ignorecase);
 	if (find) {
 		name_value_t * nv = (name_value_t*)find->data;
 		return name_value_get_value(nv);
@@ -34,15 +34,15 @@ char * ssdp_header_get_parameter(ssdp_header_t * header, const char * name)
 void ssdp_header_set_parameter(ssdp_header_t * header, const char * name, const char * value)
 {
 	list_t * find = list_find(header->parameters,
-							  (void*)name,
-							  (_cmp_cb)name_value_cmp_name_ignorecase);
+                            (void*)name,
+                            (_cmp_cb)name_value_cmp_name_ignorecase);
 
 	if (find) {
 		name_value_t * nv = (name_value_t*)find->data;
 		name_value_set_value(nv, value);
 	} else {
 		header->parameters = list_add(header->parameters,
-									  create_name_value_with_namevalue(name, value));
+                                  create_name_value_with_namevalue(name, value));
 	}
 }
 
@@ -80,8 +80,8 @@ ssdp_header_t * read_ssdp_header(const char * str)
 		} else {
 			name_value_t * nv = read_ssdp_header_parameter(line);
 			ssdp_header_set_parameter(ssdp,
-									  name_value_get_name(nv),
-									  name_value_get_value(nv));
+                                name_value_get_name(nv),
+                                name_value_get_value(nv));
 		}
 		str = end + 2;
 		end = strstr(str, "\r\n");

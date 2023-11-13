@@ -8,9 +8,9 @@ static ssize_t _callback(void * cls, uint64_t pos, char * buf, size_t buf_size)
 	http_response_t * const param = (http_response_t*)cls;
 
 	if (pos >= param->data_size)
-    {
+  {
 		return MHD_CONTENT_READER_END_OF_STREAM;
-    }
+  }
 
 	if (buf_size < (param->data_size - pos)) {
 		size_to_copy = buf_size;
@@ -24,7 +24,7 @@ static ssize_t _callback(void * cls, uint64_t pos, char * buf, size_t buf_size)
 }
 
 static int _get_request_key(void * cls, enum MHD_ValueKind kind,
-							const char * key, const char * value)
+                            const char * key, const char * value)
 {
 	http_server_request_t * req = cls;
 	http_header_set_parameter(req->header, key, value);
@@ -36,19 +36,19 @@ static int _response_not_found(struct MHD_Connection * conn)
 	const char * text = "Not found\n";
 	struct MHD_Response * res;
 	res = MHD_create_response_from_buffer(strlen(text),
-										  (void*)text,
-										  MHD_RESPMEM_PERSISTENT);
+                                        (void*)text,
+                                        MHD_RESPMEM_PERSISTENT);
 	return MHD_queue_response(conn, MHD_HTTP_NOT_FOUND, res);
 }
 
 static int _handler(void * cls,
-					struct MHD_Connection * conn,
-					const char * url,
-					const char * method,
-					const char * version,
-					const char * upload_data,
-					size_t * upload_data_size,
-					void ** ptr)
+                    struct MHD_Connection * conn,
+                    const char * url,
+                    const char * method,
+                    const char * version,
+                    const char * upload_data,
+                    size_t * upload_data_size,
+                    void ** ptr)
 {
 	static int aptr;
 	http_server_t * server = (http_server_t*)cls;
@@ -56,15 +56,15 @@ static int _handler(void * cls,
 		/* do never respond on first call */
 		*ptr = &aptr;
 		return MHD_YES;
-    }
+  }
 	*ptr = NULL;				/* reset when done */
 
 	if (server && server->handler_cb) {
 		http_server_request_t req = {.method = method,
-									 .path = url,
-									 .header = create_http_header(),
-									 .data = upload_data,
-									 .data_size = *upload_data_size};
+      .path = url,
+      .header = create_http_header(),
+      .data = upload_data,
+      .data_size = *upload_data_size};
 		http_response_t * res;
 		struct MHD_Response * _res;
 		int ret;
@@ -83,10 +83,10 @@ static int _handler(void * cls,
 		}
 		
 		_res = MHD_create_response_from_callback(MHD_SIZE_UNKNOWN,
-												 1024,
-												 &_callback,
-												 res,
-												 (_free_cb)free_http_response);
+                                             1024,
+                                             &_callback,
+                                             res,
+                                             (_free_cb)free_http_response);
 		if (_res == NULL)
 		{
 			free_http_response(res);
@@ -132,12 +132,12 @@ void free_http_server(http_server_t * server)
 void start_http_server(http_server_t * server)
 {
 	server->ptr = (void*)MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION,
-										  server->port,
-										  NULL,
-										  NULL,
-										  &_handler,
-										  server,
-										  MHD_OPTION_END);
+                                        server->port,
+                                        NULL,
+                                        NULL,
+                                        &_handler,
+                                        server,
+                                        MHD_OPTION_END);
 	assert(server->ptr != NULL);
 }
 

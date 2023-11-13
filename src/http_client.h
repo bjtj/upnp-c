@@ -9,13 +9,13 @@
 extern void http_client_global_init(void);
 extern void http_client_global_release(void);
 extern http_response_t * http_client_get_dump(const char * url,
-											  list_t * parameters);
+                                              list_t * parameters);
 extern http_response_t * http_client_post(const char * url,
-										  list_t * parameters,
-										  const char * type,
-										  const char * text);
+                                          list_t * parameters,
+                                          const char * type,
+                                          const char * text);
 extern http_response_t * http_client_custom(const char * url,
-											list_t * parameters,
-											const char * method);
+                                            list_t * parameters,
+                                            const char * method);
 
 #endif

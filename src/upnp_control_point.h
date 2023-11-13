@@ -11,7 +11,7 @@ typedef void (*cb_on_event)(const char *, list_t *);
 
 typedef struct _upnp_control_point_t
 {
-    int done;
+  int done;
 	int port;
 	list_t * devices;
 	pthread_t ssdp_receiver_thread;

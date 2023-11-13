@@ -22,8 +22,8 @@ static upnp_service_t * s_read_service_node(xmlNode * node)
 				continue;
 			}
 			service->properties = property_put(service->properties,
-											   (char*)cur_node->name,
-											   (char*)first->content);
+                                         (char*)cur_node->name,
+                                         (char*)first->content);
 		}
 	}
 
@@ -135,7 +135,7 @@ static upnp_argument_t * s_read_argument(xmlNode * node)
 				continue;
 			}
 			argument->direction = ((xmlStrcmp(first->content, (xmlChar*)"in") == 0)
-								   ? DIR_IN : DIR_OUT);
+                             ? DIR_IN : DIR_OUT);
 		}
 	}
 
@@ -177,10 +177,10 @@ static upnp_state_variable_t * s_read_state_variable(xmlNode * node)
 	attrs = node->properties;
 	for (; attrs; attrs = attrs->next) {
 		if ((xmlStrcmp(attrs->name, (xmlChar*)"sendEvents") == 0) &&
-			(xmlStrcmp(attrs->xmlChildrenNode->content, (xmlChar*)"yes") == 0)) {
+        (xmlStrcmp(attrs->xmlChildrenNode->content, (xmlChar*)"yes") == 0)) {
 			upnp_state_variable_set_send_events(state_variable, 1);
 		} else if ((xmlStrcmp(attrs->name, (xmlChar*)"multicast") == 0) &&
-				   (xmlStrcmp(attrs->xmlChildrenNode->content, (xmlChar*)"yes") == 0)) {
+               (xmlStrcmp(attrs->xmlChildrenNode->content, (xmlChar*)"yes") == 0)) {
 			upnp_state_variable_set_multicast(state_variable, 1);
 		}
 	}
@@ -309,16 +309,16 @@ upnp_action_request_t * upnp_read_action_request(const char * xml)
 							xmlNode * first = param_node->xmlChildrenNode;
 							if (!first) {
 								upnp_action_request_put(request,
-														(char*)param_node->name,
-														"");
+                                        (char*)param_node->name,
+                                        "");
 								continue;
 							}
 							if (first->next) {
 								continue;
 							}
 							upnp_action_request_put(request,
-													(char*)param_node->name,
-													(char*)first->content);
+                                      (char*)param_node->name,
+                                      (char*)first->content);
 						}
 					}
 					break;
@@ -363,13 +363,13 @@ upnp_action_response_t * upnp_read_action_response(const char * xml)
 			for (; node; node = node->next)
 			{
 				if (node->type == XML_ELEMENT_NODE &&
-					xmlStrlen(node->name) > strlen("Response"))
+            xmlStrlen(node->name) > strlen("Response"))
 				{
 					xmlNode * param_node = node->xmlChildrenNode;
 					char action_name[128] = {0,};
 					snprintf(action_name, sizeof(action_name), "%.*s",
-							 (int)(xmlStrlen(node->name) - strlen("Response")),
-							 node->name);
+                   (int)(xmlStrlen(node->name) - strlen("Response")),
+                   node->name);
 					upnp_action_response_set_action_name(response, action_name);
 					/* todo: service type */
 					for (; param_node; param_node = param_node->next) {
@@ -377,16 +377,16 @@ upnp_action_response_t * upnp_read_action_response(const char * xml)
 							xmlNode * first = param_node->xmlChildrenNode;
 							if (!first) {
 								upnp_action_response_put(response,
-														 (char*)param_node->name,
-														 "");
+                                         (char*)param_node->name,
+                                         "");
 								continue;
 							}
 							if (first->next) {
 								continue;
 							}
 							upnp_action_response_put(response,
-													 (char*)param_node->name,
-													 (char*)first->content);
+                                       (char*)param_node->name,
+                                       (char*)first->content);
 						}
 					}
 					break;
@@ -428,13 +428,13 @@ char * upnp_write_action_request(upnp_action_request_t * req)
 	VALID_RC(rc);
 
 	rc = xmlTextWriterWriteAttribute(writer,
-									 BAD_CAST "s:encodingStyle",
-									 BAD_CAST "http://schemas.xmlsoap.org/soap/encoding/");
+                                   BAD_CAST "s:encodingStyle",
+                                   BAD_CAST "http://schemas.xmlsoap.org/soap/encoding/");
 	VALID_RC(rc);
 
 	rc = xmlTextWriterWriteAttribute(writer,
-									 BAD_CAST "xmlns:s",
-									 BAD_CAST "http://schemas.xmlsoap.org/soap/envelope/");
+                                   BAD_CAST "xmlns:s",
+                                   BAD_CAST "http://schemas.xmlsoap.org/soap/envelope/");
 	VALID_RC(rc);
 
 
@@ -448,8 +448,8 @@ char * upnp_write_action_request(upnp_action_request_t * req)
 	VALID_RC(rc);
 
 	rc = xmlTextWriterWriteAttribute(writer,
-									 BAD_CAST "xmlns:u",
-									 BAD_CAST upnp_action_request_get_service_type(req));
+                                   BAD_CAST "xmlns:u",
+                                   BAD_CAST upnp_action_request_get_service_type(req));
 	VALID_RC(rc);
 
 	/* params */
@@ -458,8 +458,8 @@ char * upnp_write_action_request(upnp_action_request_t * req)
 		name_value_t * nv = (name_value_t*)lst->data;
 		/* single element */
 		rc = xmlTextWriterWriteFormatElement(writer,
-											 BAD_CAST name_value_get_name(nv),
-											 "%s", name_value_get_value(nv));
+                                         BAD_CAST name_value_get_name(nv),
+                                         "%s", name_value_get_value(nv));
 		VALID_RC(rc);
 	}
 
@@ -507,13 +507,13 @@ char * upnp_write_action_response(upnp_action_response_t * res)
 	VALID_RC(rc);
 
 	rc = xmlTextWriterWriteAttribute(writer,
-									 BAD_CAST "s:encodingStyle",
-									 BAD_CAST "http://schemas.xmlsoap.org/soap/encoding/");
+                                   BAD_CAST "s:encodingStyle",
+                                   BAD_CAST "http://schemas.xmlsoap.org/soap/encoding/");
 	VALID_RC(rc);
 
 	rc = xmlTextWriterWriteAttribute(writer,
-									 BAD_CAST "xmlns:s",
-									 BAD_CAST "http://schemas.xmlsoap.org/soap/envelope/");
+                                   BAD_CAST "xmlns:s",
+                                   BAD_CAST "http://schemas.xmlsoap.org/soap/envelope/");
 	VALID_RC(rc);
 
 
@@ -527,8 +527,8 @@ char * upnp_write_action_response(upnp_action_response_t * res)
 	VALID_RC(rc);
 
 	rc = xmlTextWriterWriteAttribute(writer,
-									 BAD_CAST "xmlns:u",
-									 BAD_CAST upnp_action_response_get_service_type(res));
+                                   BAD_CAST "xmlns:u",
+                                   BAD_CAST upnp_action_response_get_service_type(res));
 	VALID_RC(rc);
 
 	/* params */
@@ -537,8 +537,8 @@ char * upnp_write_action_response(upnp_action_response_t * res)
 		name_value_t * nv = (name_value_t*)lst->data;
 		/* single element */
 		rc = xmlTextWriterWriteFormatElement(writer,
-											 BAD_CAST name_value_get_name(nv),
-											 "%s", name_value_get_value(nv));
+                                         BAD_CAST name_value_get_name(nv),
+                                         "%s", name_value_get_value(nv));
 		VALID_RC(rc);
 	}
 
@@ -586,7 +586,7 @@ list_t * upnp_read_propertyset(const char * xml)
 
 	for (cur_node = root->xmlChildrenNode; cur_node; cur_node = cur_node->next) {
 		if (cur_node->type == XML_ELEMENT_NODE &&
-			xmlStrcmp(cur_node->name, (xmlChar*)"property") == 0)
+        xmlStrcmp(cur_node->name, (xmlChar*)"property") == 0)
 		{
 			xmlNode * property_node = cur_node->xmlChildrenNode;
 			for (; property_node; property_node = property_node->next) {
@@ -632,8 +632,8 @@ char * upnp_write_propertyset(list_t * props)
 	VALID_RC(rc);
 
 	rc = xmlTextWriterWriteAttribute(writer,
-									 BAD_CAST "xmlns:e",
-									 BAD_CAST "urn:schemas-upnp-org:event-1-0");
+                                   BAD_CAST "xmlns:e",
+                                   BAD_CAST "urn:schemas-upnp-org:event-1-0");
 	VALID_RC(rc);
 
 
@@ -647,8 +647,8 @@ char * upnp_write_propertyset(list_t * props)
 		
 		/* single element */
 		rc = xmlTextWriterWriteFormatElement(writer,
-											 BAD_CAST name_value_get_name(nv),
-											 "%s", name_value_get_value(nv));
+                                         BAD_CAST name_value_get_name(nv),
+                                         "%s", name_value_get_value(nv));
 		VALID_RC(rc);
 	}
 	
@@ -727,8 +727,8 @@ char * upnp_write_scpd(upnp_scpd_t * scpd)
 	VALID_RC(rc);
 	
 	rc = xmlTextWriterWriteAttribute(writer,
-									 BAD_CAST "xmlns",
-									 BAD_CAST "urn:schemas-upnp-org:service-1-0");
+                                   BAD_CAST "xmlns",
+                                   BAD_CAST "urn:schemas-upnp-org:service-1-0");
 	VALID_RC(rc);
 
 	{
@@ -880,7 +880,7 @@ static void _write_argument_node(xmlTextWriterPtr writer, upnp_argument_t * argu
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "argument");
 	VALID_RC(rc);
 
-    rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "name", "%s", argument->name);
+  rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "name", "%s", argument->name);
 	VALID_RC(rc);
 
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "direction", "%s", argument->direction == DIR_IN ? "in" : "out");

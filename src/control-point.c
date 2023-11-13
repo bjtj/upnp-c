@@ -210,6 +210,6 @@ int main(int argc, char *argv[])
 	free(session.action);
 
 	printf("Bye\n");
-    return 0;
+  return 0;
 }
 

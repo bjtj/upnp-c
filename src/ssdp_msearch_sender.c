@@ -34,7 +34,7 @@ void ssdp_send_msearch(ssdp_msearch_sender_t * sender, const char * type, int mx
 
 	char buffer[SSDP_PACKET_MAX] = {0,};
 	snprintf(buffer, sizeof(buffer), SSDP_FMT,
-			 SSDP_HOST, SSDP_PORT, type, mx, "\"ssdp:discover\"");
+           SSDP_HOST, SSDP_PORT, type, mx, "\"ssdp:discover\"");
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
